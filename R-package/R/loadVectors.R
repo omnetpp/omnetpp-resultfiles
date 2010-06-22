@@ -25,123 +25,124 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-# filters
+evalCommands <- function(commands) {
 
-# TODO conflicts with loadDataset(add())
-#add <- function (c) {
-#}
+    add <- function (c) {
+      list("add", c=c)
+    }
 
-compare <- function (eq, gt, lt, x) {
-  list("compare", ifEqual=eq, ifGreater=gt, ifLess=lt, threshold=x)
-}
+    compare <- function (eq, gt, lt, x) {
+      list("compare", ifEqual=eq, ifGreater=gt, ifLess=lt, threshold=x)
+    }
+    
+    crop <- function (t1, t2) {
+      list("crop", t1=t1, t2=t2)
+    }
+    
+    difference <- function () {
+      list("difference")
+    }
+    
+    diffquot <- function () {
+      list("diffquot")
+    }
+    
+    divideBy <- function (a) {
+      list("divide-by", a=a)
+    }
+    
+    divtime <- function () {
+      list("divtime")
+    }
+    
+    expression <- function (expression) {
+      list("expression", expression=expression)
+    }
+    
+    integrate <- function (interpolationMode) {
+      list("integrate", 'interpolation-mode'=interpolationMode)
+    }
+    
+    lineartrend <- function (a) {
+      list("lineartrend", a=a)
+    }
+    
+    mean <- function () {
+      list("mean")
+    }
+    
+    modulo <- function (a) {
+      list("modulo", a=a)
+    }
+    
+    movingavg <- function (alpha) {
+      list("movingavg", alpha=alpha)
+    }
+    
+    multiplyBy <- function (a) {
+      list("multiply-by", a=a)
+    }
+    
+    removerepeats <- function () {
+      list("removerepeats")
+    }
+    
+    slidingwinavg <- function (windowSize) {
+      list("slidingwinavg", windowSize=windowSize)
+    }
+    
+    sum <- function () {
+      list("sum")
+    }
+    
+    timeavg <- function(interpolationMode) {
+      list("timeavg", 'interpolation-mode'=interpolationMode)
+    }
+    
+    timediff <- function() {
+      list("timediff")
+    }
+    
+    timeshift <- function(dt) {
+      list("timeshift", dt=dt)
+    }
+    
+    timetoserial <- function () {
+      list("timetoserial")
+    }
+    
+    timewinavg <- function (windowSize) {
+      list("timewinavg", windowSize=windowSize)
+    }
+    
+    winavg <- function (windowSize) {
+      list("winavg", windowSize=windowSize)
+    }
 
-crop <- function (t1, t2) {
-  list("crop", t1=t1, t2=t2)
-}
-
-difference <- function () {
-  list("difference")
-}
-
-diffquot <- function () {
-  list("diffquot")
-}
-
-divideBy <- function (a) {
-  list("divide-by", a=a)
-}
-
-divtime <- function () {
-  list("divtime")
-}
-
-expression <- function (expression) {
-  list("expression", expression=expression)
-}
-
-integrate <- function (interpolationMode) {
-  list("integrate", 'interpolation-mode'=interpolationMode)
-}
-
-lineartrend <- function (a) {
-  list("lineartrend", a=a)
-}
-
-mean <- function () {
-  list("mean")
-}
-
-modulo <- function (a) {
-  list("modulo", a=a)
-}
-
-movingavg <- function (alpha) {
-  list("movingavg", alpha=alpha)
-}
-
-multiplyBy <- function (a) {
-  list("multiply-by", a=a)
-}
-
-removerepeats <- function () {
-  list("removerepeats")
-}
-
-slidingwinavg <- function (windowSize) {
-  list("slidingwinavg", windowSize=windowSize)
-}
-
-sum <- function () {
-  list("sum")
-}
-
-timeavg <- function(interpolationMode) {
-  list("timeavg", 'interpolation-mode'=interpolationMode)
-}
-
-timediff <- function() {
-  list("timediff")
-}
-
-timeshift <- function(dt) {
-  list("timeshift", dt=dt)
-}
-
-timetoserial <- function () {
-  list("timetoserial")
-}
-
-timewinavg <- function (windowSize) {
-  list("timewinavg", windowSize=windowSize)
-}
-
-winavg <- function (windowSize) {
-  list("winavg", windowSize=windowSize)
-}
-
-# Commands
-
-apply <- function (fun, select) {
-  if(missing(select)) {
-    list("apply", fun=fun)
-  }
-  else {
-    list("apply", fun=fun, select=select)
-  }
-}
-
-compute <- function (fun, select) {
-  if(missing(select)) {
-    list("compute", fun=fun)
-  }
-  else {
-    list("compute", fun=fun, select=select)
-  }
+    apply <- function (filter, select) {
+      if(missing(select)) {
+        list("apply", fun=filter)
+      }
+      else {
+        list("apply", fun=filter, select=select)
+      }
+    }
+    
+    compute <- function (filter, select) {
+      if(missing(select)) {
+        list("compute", fun=filter)
+      }
+      else {
+        list("compute", fun=filter, select=select)
+      }
+    }
+    
+    eval(commands, envir=as.list(environment()), enclos=parent.frame(2))
 }
 
 loadVectors <- function (vectors, ...) {
   vectors$file <- as.character(vectors$file)
-  commands <- list(...)
+  commands <- evalCommands(substitute(list(...)))
 
   dataset <- .Call('callLoadVectors', vectors, commands)
 

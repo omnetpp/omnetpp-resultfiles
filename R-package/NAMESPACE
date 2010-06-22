@@ -1,10 +1,6 @@
 useDynLib(omnetpp)
 
 export(loadDataset, add, discard)
-export(loadVectors, apply, compute,
-       compare, crop, difference, diffquot, divideBy, divtime, expression,
-       integrate, lineartrend, mean, modulo, movingavg, multiplyBy,
-       removerepeats, slidingwinavg, sum, timeavg, timediff, timeshift,
-       timetoserial, timewinavg, winavg)
+export(loadVectors)
 export(createBarChartDataset, createHistograms, createScatterChartDataset)
 export(plotBarChart, plotHistogramChart, plotLineChart)
