@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// TODO one sequence for each key in the dataset, use the name 'key'
 // TODO IDE should use 'runid' as field name, instead of 'run'
 
 #include <iostream>
@@ -159,7 +158,7 @@ static void executeCommands(SEXP files, SEXP commands, ResultFileManager &manage
     }
 }
 
-static void addResultItemAttributes(SEXP attributes, int &currentIndex, const char *type, const IDList &ids, const ResultFileManager &manager)
+static void addResultItemAttributes(SEXP attributes, int &currentIndex, const char *type, const IDList &ids, int keyStart, const ResultFileManager &manager)
 {
     SEXP types=VECTOR_ELT(attributes, 0), keys=VECTOR_ELT(attributes, 1), names=VECTOR_ELT(attributes, 2), values=VECTOR_ELT(attributes, 3);
     SEXP typeSEXP = mkChar(type); // immutable, so can be shared
@@ -171,7 +170,7 @@ static void addResultItemAttributes(SEXP attributes, int &currentIndex, const ch
             const char *nameStr = it->first.c_str();
             const char *valueStr = it->second.c_str();
             SET_STRING_ELT(types, currentIndex, typeSEXP);
-            INTEGER(keys)[currentIndex] = i;
+            INTEGER(keys)[currentIndex] = keyStart + i;
             SET_STRING_ELT(names, currentIndex, mkChar(nameStr));
             SET_STRING_ELT(values, currentIndex, mkChar(valueStr));
             currentIndex++;
@@ -206,23 +205,23 @@ const char* filerunColumnNames[] = {"runid", "file"};
 const SEXPTYPE filerunColumnTypes[] = {STRSXP, STRSXP};
 const int filerunColumnsLength = sizeof(filerunColumnNames) / sizeof(const char*);
 
-const char* scalarColumnNames[] = {"scalar_key", "runid", "file", "module", "name", "value"};
+const char* scalarColumnNames[] = {"resultkey", "runid", "file", "module", "name", "value"};
 const SEXPTYPE scalarColumnTypes[] = {INTSXP, STRSXP, STRSXP, STRSXP, STRSXP, REALSXP};
 const int scalarColumnsLength = sizeof(scalarColumnNames) / sizeof(const char*);
 
-const char* vectorColumnNames[] = {"vector_key", "runid", "file", "vectorid", "module", "name"};
+const char* vectorColumnNames[] = {"resultkey", "runid", "file", "vectorid", "module", "name"};
 const SEXPTYPE vectorColumnTypes[] = {INTSXP, STRSXP, STRSXP, INTSXP, STRSXP, STRSXP};
 const int vectorColumnsLength = sizeof(vectorColumnNames) / sizeof(const char*);
 
-const char* histogramColumnNames[] = {"histogram_key", "runid", "file", "module", "name"};
+const char* histogramColumnNames[] = {"resultkey", "runid", "file", "module", "name"};
 const SEXPTYPE histogramColumnTypes[] = {INTSXP, STRSXP, STRSXP, STRSXP, STRSXP};
 const int histogramColumnsLength = sizeof(histogramColumnNames) / sizeof(const char*);
 
-const char* fieldColumnNames[] = {"histogram_key", "name", "value"};
+const char* fieldColumnNames[] = {"resultkey", "name", "value"};
 const SEXPTYPE fieldColumnTypes[] = {INTSXP, STRSXP, REALSXP};
 const int fieldColumnsLength = sizeof(fieldColumnNames) / sizeof(const char*);
 
-const char* binColumnNames[] = {"histogram_key", "lowerbound", "upperbound", "count"};
+const char* binColumnNames[] = {"resultkey", "lowerbound", "upperbound", "count"};
 const SEXPTYPE binColumnTypes[] = {INTSXP, REALSXP, REALSXP, REALSXP};
 const int binColumnsLength = sizeof(binColumnNames) / sizeof(const char*);
 
@@ -230,7 +229,7 @@ const char* paramColumnNames[] = {"runid", "name", "value"};
 const SEXPTYPE paramColumnTypes[] = {STRSXP, STRSXP, STRSXP};
 const int paramColumnsLength = sizeof(paramColumnNames) / sizeof(const char*);
 
-const char* attributeColumnNames[] = {"type", "key", "name", "value"};
+const char* attributeColumnNames[] = {"type", "resultkey", "name", "value"};
 const SEXPTYPE attributeColumnTypes[] = {STRSXP, INTSXP, STRSXP, STRSXP};
 const int attributeColumnsLength = sizeof(attributeColumnNames) / sizeof(const char*);
 
@@ -291,8 +290,9 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
     // scalars
     IDList scalarIDs = filterIDListByType(idlist, ResultFileManager::SCALAR, manager);
     int scalarCount = scalarIDs.size();
+    int scalarKeyStart = 0;
     SEXP scalars = createDataFrame(scalarColumnNames, scalarColumnTypes, scalarColumnsLength, scalarCount);
-    SEXP scalarKey = VECTOR_ELT(scalars, 0);
+    SEXP resultKey = VECTOR_ELT(scalars, 0);
     runid = VECTOR_ELT(scalars, 1);
     file = VECTOR_ELT(scalars, 2);
     SEXP module = VECTOR_ELT(scalars, 3);
@@ -306,7 +306,7 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
         const ScalarResult &scalar = manager.getScalar(id);
         attrCount += scalar.attributes.size();
 
-        INTEGER(scalarKey)[i] = i;
+        INTEGER(resultKey)[i] = scalarKeyStart + i;
         SET_STRING_ELT(runid, i, mkChar(scalar.fileRunRef->runRef->runName.c_str()));
         SET_STRING_ELT(file, i, mkChar(scalar.fileRunRef->fileRef->fileSystemFilePath.c_str()));
         SET_STRING_ELT(module, i, mkChar(scalar.moduleNameRef->c_str()));
@@ -317,8 +317,9 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
     // vectors
     IDList vectorIDs = filterIDListByType(idlist, ResultFileManager::VECTOR, manager);
     int vectorCount = vectorIDs.size();
+    int vectorKeyStart = scalarKeyStart + scalarCount;
     SEXP vectors = createDataFrame(vectorColumnNames, vectorColumnTypes, vectorColumnsLength, vectorCount);
-    SEXP vectorKey = VECTOR_ELT(vectors, 0);
+    resultKey = VECTOR_ELT(vectors, 0);
     runid = VECTOR_ELT(vectors, 1);
     file = VECTOR_ELT(vectors, 2);
     SEXP vectorid = VECTOR_ELT(vectors, 3);
@@ -332,7 +333,7 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
         const VectorResult &vector = manager.getVector(id);
         attrCount += vector.attributes.size();
 
-        INTEGER(vectorKey)[i] = i;
+        INTEGER(resultKey)[i] = vectorKeyStart + i;
         SET_STRING_ELT(runid, i, mkChar(vector.fileRunRef->runRef->runName.c_str()));
         SET_STRING_ELT(file, i, mkChar(vector.fileRunRef->fileRef->fileSystemFilePath.c_str()));
         INTEGER(vectorid)[i] = vector.vectorId;
@@ -343,8 +344,9 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
     // histograms
     IDList histogramIDs = filterIDListByType(idlist, ResultFileManager::HISTOGRAM, manager);
     int histogramCount = histogramIDs.size();
+    int histogramKeyStart = vectorKeyStart + vectorCount;
     SEXP histograms = createDataFrame(histogramColumnNames, histogramColumnTypes, histogramColumnsLength, histogramCount);
-    SEXP histogramKey = VECTOR_ELT(histograms, 0);
+    resultKey = VECTOR_ELT(histograms, 0);
     runid = VECTOR_ELT(histograms, 1);
     file = VECTOR_ELT(histograms, 2);
     module = VECTOR_ELT(histograms, 3);
@@ -360,7 +362,7 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
         fieldCount += histogram.fields.size();
         attrCount += histogram.attributes.size();
 
-        INTEGER(histogramKey)[i] = i;
+        INTEGER(resultKey)[i] = histogramKeyStart + i;
         SET_STRING_ELT(runid, i, mkChar(histogram.fileRunRef->runRef->runName.c_str()));
         SET_STRING_ELT(file, i, mkChar(histogram.fileRunRef->fileRef->fileSystemFilePath.c_str()));
         SET_STRING_ELT(module, i, mkChar(histogram.moduleNameRef->c_str()));
@@ -369,7 +371,7 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
 
     // fields
     SEXP fields = createDataFrame(fieldColumnNames, fieldColumnTypes, fieldColumnsLength, fieldCount);
-    histogramKey = VECTOR_ELT(fields, 0);
+    resultKey = VECTOR_ELT(fields, 0);
     name = VECTOR_ELT(fields, 1);
     value = VECTOR_ELT(fields, 2);
     SET_ELEMENT(dataset, 5, fields);
@@ -383,7 +385,7 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
 
         for(HistogramFields::const_iterator it = fields.begin(); it != fields.end(); ++it)
         {
-            INTEGER(histogramKey)[index] = i;
+            INTEGER(resultKey)[index] = histogramKeyStart + i;
             SET_STRING_ELT(name, index, mkChar(it->first.c_str()));
             REAL(value)[index] = it->second;
             index++;
@@ -392,7 +394,7 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
 
     // bins
     SEXP bins = createDataFrame(binColumnNames, binColumnTypes, binColumnsLength, binCount);
-    histogramKey = VECTOR_ELT(bins, 0);
+    resultKey = VECTOR_ELT(bins, 0);
     SEXP lowerbound=VECTOR_ELT(bins, 1), upperbound=VECTOR_ELT(bins, 2), count=VECTOR_ELT(bins, 3);
     SET_ELEMENT(dataset, 6, bins);
     UNPROTECT(1); // bins
@@ -404,7 +406,7 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
         int size = histogram.bins.size();
         for (int j = 0; j < size; ++j)
         {
-            INTEGER(histogramKey)[index] = i;
+            INTEGER(resultKey)[index] = histogramKeyStart + i;
             REAL(lowerbound)[index] = histogram.bins[j];
             REAL(upperbound)[index] = j+1 < size ? histogram.bins[j+1] : R_PosInf;
             REAL(count)[index] = histogram.values[j];
@@ -440,9 +442,9 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
     SET_ELEMENT(dataset, 8, attrs);
     UNPROTECT(1); // attrs
     index = 0;
-    addResultItemAttributes(attrs, index, "scalar", scalarIDs, manager);
-    addResultItemAttributes(attrs, index, "vector", vectorIDs, manager);
-    addResultItemAttributes(attrs, index, "histogram", histogramIDs, manager);
+    addResultItemAttributes(attrs, index, "scalar", scalarIDs, scalarKeyStart, manager);
+    addResultItemAttributes(attrs, index, "vector", vectorIDs, vectorKeyStart, manager);
+    addResultItemAttributes(attrs, index, "histogram", histogramIDs, histogramKeyStart, manager);
 
     UNPROTECT(1); // dataset
 

@@ -27,7 +27,7 @@
 
 createHistograms <- function (dataset) {
   makeHist <- function(key, name) {
-      bins <- dataset$bins[dataset$bins$histogram_key == key,]
+      bins <- dataset$bins[dataset$bins$resultkey == key,]
       # remove under/overflow bins
       overflowCellIndex <- which(!is.finite(bins$lowerbound))
       overflowCount <- if (is.null(overflowCellIndex)) 0 else bins$count[overflowCellIndex]
@@ -65,12 +65,12 @@ createHistograms <- function (dataset) {
 
   }
 
-  data <- merge(getRunsInWideFormat(dataset$runattrs), dataset$histograms)
+  data <- merge(getRunsInWideFormat(dataset$runattrs), dataset$histograms, by='runid')
   histogramNames <- getResultItemNames(data)
   hs <- lapply(seq_along(histogramNames),
                function (i) {
                  name <- histogramNames[i]
-                 key  <- data$histogram_key[i]
+                 key  <- data$resultkey[i]
                  makeHist(key, name)
                })
   names(hs) <- histogramNames

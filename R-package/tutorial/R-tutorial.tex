@@ -449,9 +449,9 @@ The \ttt{vectordata} component contains data from all vectors;
 you can use the \ttt{split()} function to split it to separate vectors:
 
 \begin{verbatim}
-> split(v$vectordata, v$vectordata$vector_key)
+> split(v$vectordata, v$vectordata$resultkey)
 $`0`
-  vector_key eventno         x          y
+   resultkey eventno         x          y
 1          0       2  1.199993  0.0000000
 2          0       5  2.540825  0.2951858
 3          0      15  4.565747  1.9815322
@@ -459,7 +459,7 @@ $`0`
 ...
 
 $`1`
-   vector_key eventno         x y
+    resultkey eventno         x y
 10          1       2  1.199993 0
 11          1       4  2.245639 1
 12          1       5  2.540825 0
@@ -468,7 +468,7 @@ $`1`
 ...
 
 $`9`
-   vector_key eventno        x y
+    resultkey eventno        x y
 86          9      34 13.77896 1
 87          9      36 15.69610 2
 88          9      38 17.17379 3
@@ -478,7 +478,8 @@ $`9`
 To create a chart from all vectors:
 
 \begin{verbatim}
-> plotLineChart(split(v$vectordata, v$vectordata$vector_key), list(X.Axis.Title='t', Y.Axis.Title='data'))
+> plotLineChart(split(v$vectordata, v$vectordata$resultkey),
+list(X.Axis.Title='t', Y.Axis.Title='data'))
 \end{verbatim}
 
 

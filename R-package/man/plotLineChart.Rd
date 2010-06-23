@@ -60,7 +60,7 @@
 \examples{
 d <- loadDataset(system.file('extdata/PureAloha1-0.vec', package='omnetpp'), add(type='vector'))
 vectors <- loadVectors(d$vectors)
-plotLineChart(split(vectors$vectordata, vectors$vectordata$vector_key), list())
+plotLineChart(split(vectors$vectordata, vectors$vectordata$resultkey), list())
 }
 
 \keyword{hplot}

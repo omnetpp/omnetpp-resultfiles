@@ -83,11 +83,11 @@
 
 \value{
   a list with 3 components:
-  \item{vectors}{dataframe of vectors with (vector_key, ospath, vectorid, module, name) columns, ospath is '' for computed vectors}
-  \item{vectordata}{dataframe of vector data with (vector_key, eventno, x, y) columns}
-  \item{attrs}{dataframe of attributes of computed vectors with (vector_key, name, value) columns}
+  \item{vectors}{dataframe of vectors with (resultkey, ospath, vectorid, module, name) columns, ospath is '' for computed vectors}
+  \item{vectordata}{dataframe of vector data with (resultkey, eventno, x, y) columns}
+  \item{attrs}{dataframe of attributes of computed vectors with (resultkey, name, value) columns}
   
-  The key columns represent the links between the objects.
+  The 'resultkey' columns represent the links between the objects.
 }
 
 \seealso{\link{patterns}, \link{filters}}

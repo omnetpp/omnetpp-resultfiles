@@ -187,15 +187,15 @@ static Vectors loadVectors(SEXP vectors, SEXP commands, ResultFileManager &manag
 static const char* datasetColumnNames[] = {"vectors", "vectordata", "attrs"};
 static const int datasetColumnsLength = sizeof(datasetColumnNames) / sizeof(const char*);
 
-static const char* vectorColumnNames[] = {"vector_key", "file", "vectorid", "module", "name"};
+static const char* vectorColumnNames[] = {"resultkey", "file", "vectorid", "module", "name"};
 static const SEXPTYPE vectorColumnTypes[] = {INTSXP, STRSXP, INTSXP, STRSXP, STRSXP};
 static const int vectorColumnsLength = sizeof(vectorColumnNames) / sizeof(const char*);
 
-static const char* vectordataColumnNames[] = {"vector_key", "eventno", "x", "y"};
+static const char* vectordataColumnNames[] = {"resultkey", "eventno", "x", "y"};
 static const SEXPTYPE vectordataColumnTypes[] = {INTSXP, INTSXP, REALSXP, REALSXP};
 static const int vectordataColumnsLength = sizeof(vectordataColumnNames) / sizeof(const char*);
 
-static const char* attributeColumnNames[] = {"vector_key", "name", "value"};
+static const char* attributeColumnNames[] = {"resultkey", "name", "value"};
 static const SEXPTYPE attributeColumnTypes[] = {INTSXP, STRSXP, STRSXP};
 static const int attributeColumnsLength = sizeof(attributeColumnNames) / sizeof(const char*);
 
@@ -209,7 +209,7 @@ static SEXP exportVectors(const ResultFileManager &manager, const Vectors &vecs)
     int vectorCount = vecs.size();
     int vectordataCount = 0, attrCount = 0;
     SEXP vectors = createDataFrame(vectorColumnNames, vectorColumnTypes, vectorColumnsLength, vectorCount);
-    SEXP vectorKey = VECTOR_ELT(vectors, 0);
+    SEXP resultKey = VECTOR_ELT(vectors, 0);
     SEXP file = VECTOR_ELT(vectors, 1);
     SEXP vectorid = VECTOR_ELT(vectors, 2);
     SEXP module = VECTOR_ELT(vectors, 3);
@@ -223,7 +223,7 @@ static SEXP exportVectors(const ResultFileManager &manager, const Vectors &vecs)
             attrCount += vector.attributes.size();
         vectordataCount += vecs[i].array->length();
 
-        INTEGER(vectorKey)[i] = i;
+        INTEGER(resultKey)[i] = i;
         SET_STRING_ELT(file, i, mkChar(vector.fileRunRef->fileRef->fileSystemFilePath.c_str()));
         INTEGER(vectorid)[i] = vector.vectorId;
         SET_STRING_ELT(module, i, mkChar(vector.moduleNameRef->c_str()));
@@ -232,7 +232,7 @@ static SEXP exportVectors(const ResultFileManager &manager, const Vectors &vecs)
 
     // vectordata
     SEXP vectordata = createDataFrame(vectordataColumnNames, vectordataColumnTypes, vectordataColumnsLength, vectordataCount);
-    vectorKey = VECTOR_ELT(vectordata, 0);
+    resultKey = VECTOR_ELT(vectordata, 0);
     SEXP eventno = VECTOR_ELT(vectordata, 1);
     SEXP x = VECTOR_ELT(vectordata, 2);
     SEXP y = VECTOR_ELT(vectordata, 3);
@@ -246,7 +246,7 @@ static SEXP exportVectors(const ResultFileManager &manager, const Vectors &vecs)
         int arrayLen = array->length();
         for (int j = 0; j < arrayLen; ++j)
         {
-            INTEGER(vectorKey)[currentIndex] = i;
+            INTEGER(resultKey)[currentIndex] = i;
             INTEGER(eventno)[currentIndex] = array->getEventNumber(j);
             REAL(x)[currentIndex] = array->getX(j);
             REAL(y)[currentIndex] = array->getY(j);
