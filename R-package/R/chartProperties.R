@@ -38,3 +38,62 @@ legendAnchoringToPosition <- function(anchoring) {
       stop("Legend.Anchoring not supported", anchoring)
     )
 }
+
+formatResultItems <- function(data, formatString) {
+  # TODO run -> runid rename
+  getField <- function(fieldName) {
+    switch(fieldName,
+      run    = data$runid,
+      index  = as.character(1:nrow(data)),
+      data[[fieldName]]
+    )
+  }
+  
+  matches <- gregexpr("(?<!\\\\)\\{([a-zA-Z-]+)\\}", formatString, perl=TRUE)
+  starts <- as.vector(matches[[1]])
+  ends <- starts + attr(matches[[1]], "match.length") - 1
+  first <- c(1)
+  last <- integer()
+  for (i in seq_along(starts)) {
+    last <- append(last, starts[i]-1)
+    first <- append(first, starts[i]+1)
+    last <- append(last, ends[i]-1)
+    first <- append(first, ends[i]+1)
+  }
+  last <- append(last, nchar(formatString))
+  segments <- substring(formatString, first, last) # literals and field names
+  args <- lapply(seq_along(segments),
+                 function(i) {
+                   if(i%%2==0)
+                     getField(segments[i])
+                   else
+                     gsub("\\\\\\{", "{", segments[i])
+                 })
+  do.call(paste, c(args, list(sep="")))
+}
+
+getDefaultNameFormat <- function(data) {
+
+  if (nrow(data) <= 1)
+    return("{module} {name}")
+
+  hasDifferentValues <- function(field) {
+    values <- switch(field,
+                run = data$runid, # TODO rename
+                data[[field]]
+              )
+    any(values!=values[1])
+  }
+  fields <- Filter(hasDifferentValues, c("file", "run", "runnumber", "module", "name", "experiment", "measurement", "replication"))
+    
+  if (length(fields) > 0)
+    do.call(paste, as.list(paste("{", fields, "}", sep="")))
+  else
+    "{module} {name} - {index}"
+}
+
+getResultItemNames <- function(data, formatString) {
+  if (missing(formatString))
+    formatString <- getDefaultNameFormat(data)
+  formatResultItems(data, formatString)
+}

@@ -26,7 +26,8 @@
 #
 
 createHistograms <- function (dataset) {
-  makeHist <- function(bins) {
+  makeHist <- function(key, name) {
+      bins <- dataset$bins[dataset$bins$histogram_key == key,]
       # remove under/overflow bins
       overflowCellIndex <- which(!is.finite(bins$lowerbound))
       overflowCount <- if (is.null(overflowCellIndex)) 0 else bins$count[overflowCellIndex]
@@ -51,7 +52,7 @@ createHistograms <- function (dataset) {
                      intensities = density,
                      density = density,
                      mids = mids,
-                     #xname = name,
+                     xname = name,
                      equidist = equidist,
 
                      # omnetpp_histogram extensions
@@ -63,11 +64,15 @@ createHistograms <- function (dataset) {
               class=c('omnetpp_histogram', 'histogram'))
 
   }
-  hs <- lapply(split(dataset$bins, dataset$bins$histogram_key), makeHist)
 
-  index <- merge(dataset$runs, dataset$histograms) # histogram_key -> histogram name ('runid.module.name')
-  rownames(index) <- index$histogram_key
-  index <- base::apply(index[c('runid','module','name')], 1, paste, collapse='.')
-  names(hs) <- lapply(names(hs), function (key) index[key])
+  data <- merge(getRunsInWideFormat(dataset$runs), dataset$histograms)
+  histogramNames <- getResultItemNames(data)
+  hs <- lapply(seq_along(histogramNames),
+               function (i) {
+                 name <- histogramNames[i]
+                 key  <- data$histogram_key[i]
+                 makeHist(key, name)
+               })
+  names(hs) <- histogramNames
   hs
 }
