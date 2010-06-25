@@ -25,12 +25,6 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-getRunsInWideFormat <- function (runattrs) {
-  runattrs <- reshape(runattrs, direction='wide', idvar='runid', timevar='name')
-  names(runattrs) <- sapply(names(runattrs), function (name) sub("^value\\.", "", name) )
-  runattrs
-}
-
 createBarChartDataset <- function (dataset, rows, columns, aggregate='mean') {
   runattrs <- getRunsInWideFormat(dataset$runattrs)
   scalars <- merge(runattrs, dataset$scalars)

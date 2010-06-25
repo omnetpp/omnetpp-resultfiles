@@ -25,6 +25,16 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+getRunsInWideFormat <- function (runattrs) {
+   drop.levels <- function(dataframe) {
+     dataframe[] <- lapply(dataframe, function(x) x[,drop=TRUE])
+     return(dataframe)
+   } 
+  runattrs <- drop.levels(reshape(runattrs, direction='wide', idvar='runid', timevar='name'))
+  names(runattrs) <- sapply(names(runattrs), function (name) sub("^value\\.", "", name) )
+  runattrs
+}
+
 legendAnchoringToPosition <- function(anchoring) {
     switch(anchoring,
       North = 'top',
