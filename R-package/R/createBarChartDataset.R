@@ -25,15 +25,15 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-getRunsInWideFormat <- function (runs) {
-  runs <- reshape(runs, direction='wide', idvar='runid', timevar='name')
-  names(runs) <- sapply(names(runs), function (name) sub("^value\\.", "", name) )
-  runs
+getRunsInWideFormat <- function (runattrs) {
+  runattrs <- reshape(runattrs, direction='wide', idvar='runid', timevar='name')
+  names(runattrs) <- sapply(names(runattrs), function (name) sub("^value\\.", "", name) )
+  runattrs
 }
 
 createBarChartDataset <- function (dataset, rows, columns, aggregate='mean') {
-  runs <- getRunsInWideFormat(dataset$runs)
-  scalars <- merge(runs, dataset$scalars)
+  runattrs <- getRunsInWideFormat(dataset$runattrs)
+  scalars <- merge(runattrs, dataset$scalars)
   rowNames = base::apply(scalars[rows], 1, paste, collapse='.')
   columnNames = base::apply(scalars[columns], 1, paste, collapse='.')
   tapply(scalars$value, list(rowNames,columnNames), base::mean)

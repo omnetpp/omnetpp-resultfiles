@@ -184,7 +184,7 @@ static Vectors loadVectors(SEXP vectors, SEXP commands, ResultFileManager &manag
     return vs;
 }
 
-static const char* datasetColumnNames[] = {"vectors", "vectordata", "attributes"};
+static const char* datasetColumnNames[] = {"vectors", "vectordata", "attrs"};
 static const int datasetColumnsLength = sizeof(datasetColumnNames) / sizeof(const char*);
 
 static const char* vectorColumnNames[] = {"vector_key", "file", "vectorid", "module", "name"};

@@ -25,6 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+// TODO one sequence for each key in the dataset, use the name 'key'
+// TODO IDE should use 'runid' as field name, instead of 'run'
+
 #include <iostream>
 #include <map>
 
@@ -192,7 +195,7 @@ static IDList filterIDListByType(const IDList &idlist, int type, const ResultFil
     return result;
 }
 
-static const char* datasetColumnNames[] = {"runs", "fileruns", "scalars", "vectors", "histograms", "fields", "bins", "params", "attributes"};
+static const char* datasetColumnNames[] = {"runattrs", "fileruns", "scalars", "vectors", "histograms", "fields", "bins", "params", "attrs"};
 static const int datasetColumnsLength = sizeof(datasetColumnNames) / sizeof(const char*);
 
 const char* runColumnNames[] = {"runid", "name", "value"};
@@ -239,7 +242,7 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
     PROTECT(dataset = NEW_LIST(9));
     setNames(dataset, datasetColumnNames, datasetColumnsLength);
 
-    // runs
+    // runattrs
     RunList *runList = manager.getUniqueRuns(idlist);
     int runCount = runList->size();
     for(int i = 0; i < runCount; ++i)
@@ -248,10 +251,10 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
         paramsCount += runPtr->moduleParams.size();
         runAttrCount += runPtr->attributes.size();
     }
-    SEXP runs = createDataFrame(runColumnNames, runColumnTypes, runColumnsLength, runAttrCount);
-    SEXP runid=VECTOR_ELT(runs,0), name=VECTOR_ELT(runs,1), value=VECTOR_ELT(runs,2);
-    SET_ELEMENT(dataset, 0, runs);
-    UNPROTECT(1); // runs
+    SEXP runattrs = createDataFrame(runColumnNames, runColumnTypes, runColumnsLength, runAttrCount);
+    SEXP runid=VECTOR_ELT(runattrs,0), name=VECTOR_ELT(runattrs,1), value=VECTOR_ELT(runattrs,2);
+    SET_ELEMENT(dataset, 0, runattrs);
+    UNPROTECT(1); // runattrs
     int index = 0;
     for (int i = 0; i < runCount; ++i)
     {
@@ -432,14 +435,14 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
         }
     }
 
-    // attributes
-    SEXP attributes = createDataFrame(attributeColumnNames, attributeColumnTypes, attributeColumnsLength, attrCount);
-    SET_ELEMENT(dataset, 8, attributes);
-    UNPROTECT(1); // attributes
+    // attrs
+    SEXP attrs = createDataFrame(attributeColumnNames, attributeColumnTypes, attributeColumnsLength, attrCount);
+    SET_ELEMENT(dataset, 8, attrs);
+    UNPROTECT(1); // attrs
     index = 0;
-    addResultItemAttributes(attributes, index, "scalar", scalarIDs, manager);
-    addResultItemAttributes(attributes, index, "vector", vectorIDs, manager);
-    addResultItemAttributes(attributes, index, "histogram", histogramIDs, manager);
+    addResultItemAttributes(attrs, index, "scalar", scalarIDs, manager);
+    addResultItemAttributes(attrs, index, "vector", vectorIDs, manager);
+    addResultItemAttributes(attrs, index, "histogram", histogramIDs, manager);
 
     UNPROTECT(1); // dataset
 

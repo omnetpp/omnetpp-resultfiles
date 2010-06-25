@@ -85,8 +85,8 @@
   a list with 3 components:
   \item{vectors}{dataframe of vectors with (vector_key, ospath, vectorid, module, name) columns, ospath is '' for computed vectors}
   \item{vectordata}{dataframe of vector data with (vector_key, eventno, x, y) columns}
-  \item{attributes}{dataframe of attributes of computed vectors with (vector_key, name, value) columns}
-
+  \item{attrs}{dataframe of attributes of computed vectors with (vector_key, name, value) columns}
+  
   The key columns represent the links between the objects.
 }
 

@@ -150,7 +150,7 @@ loadVectors <- function (vectors, ...) {
     list(
       vectors = as.data.frame(dataset$vectors),
       vectordata = as.data.frame(dataset$vectordata),
-      attributes = as.data.frame(dataset$attributes)
+      attrs = as.data.frame(dataset$attrs)
     ),
     class='omnetpp_dataset'
   )
