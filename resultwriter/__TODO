@@ -1,0 +1,7 @@
+- there are FIXMEs in the code
+- pass std::string as const std::string&  -- also map and vector! " & "...!
+- pass maps as const map&
+- revise and finish file operations (deleting, exception handling, etc)
+- precision!
+- some values unfilled in the file header
+- provide impl for statistical objects

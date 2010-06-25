@@ -1,0 +1,32 @@
+file 22750 2000000000                                           
+version 2
+run PureAloha1-0-20090807-18:29:19-29204
+attr configname PureAloha1
+attr datetime 20090807-18:29:19
+attr experiment PureAloha1
+attr inifile /home/tomi/work/omnetpp/samples/aloha/omnetpp.ini
+attr iterationvars ""
+attr iterationvars2 $repetition=0
+attr measurement ""
+attr network Aloha
+attr processid 29204
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+vector 2  Aloha.server  "channel utilization"  ETV
+attr interpolationmode linear
+attr title "chann. ut."
+attr type double
+2	11609 11141 4 2410 0.18319441745 73.562134345743 283 0.033851369604829 0.54131926095983 41.119686543408 6.3792168994965
+vector 0  Aloha.server  "collision multiplicity"  ETV
+attr interpolationmode none
+attr title "coll. mult."
+attr type int
+0	771 4286 17 2390 0.447742609224 72.645413734881 176 2 15 602 2712
+vector 1  Aloha.server  "collision length"  ETV
+attr interpolationmode none
+attr title "coll. len."
+attr unit s
+1	5057 6552 17 2390 0.447742609224 72.645413734881 176 0.100773498201 0.72850147481 35.661500208737 8.6843121510245

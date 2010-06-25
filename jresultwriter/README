@@ -1,0 +1,14 @@
+JResultWriter
+=============
+
+This is a Java library for recording OMNeT++ result files. The library also
+includes a small working simulation (Aloha) to demonstrate the use of the
+library. The code is deliberately kept simple to facilitate understanding.
+
+The library can be built into your own Java-based simulations. The benefit
+is that you'll be able to use the OMNeT++ IDE Analysis tool for interactively 
+browsing and plotting the results, and GNU R (with the use of the OMNeT++ R 
+extension) for scripting the processing and plot generation.
+
+License: BSD
+

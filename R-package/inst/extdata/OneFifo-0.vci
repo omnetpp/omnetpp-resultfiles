@@ -1,0 +1,37 @@
+file 3368 2000000000                                            
+version 2
+run OneFifo-0-20081210-11:48:12-11130
+attr configname OneFifo
+attr datetime 20081210-11:48:12
+attr experiment OneFifo
+attr inifile omnetpp.ini
+attr iterationvars ""
+attr iterationvars2 $repetition=0
+attr measurement ""
+attr network SimpleQueue
+attr processid 11130
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+vector 9  SimpleQueue.queue  "queueing time"  ETV
+9	3062 306 2 53 1.199993199098 23.242021797457 9 0 16.062425700238 64.437060911487 804.72965673364
+vector 8  SimpleQueue.queue  length  ETV
+8	2621 441 2 56 1.199993199098 23.799026840059 20 0 5 58 210
+vector 0  SimpleQueue.sink  "total lifetime"  ETV
+0	889 284 6 54 2.540824900056 23.242021797457 8 1.340831700958 17.780098327987 71.918464956834 967.79369021921
+vector 1  SimpleQueue.sink  "total queueing time"  ETV
+1	1173 271 6 54 2.540824900056 23.242021797457 8 0 16.062425700238 49.876436358475 592.71786935986
+vector 2  SimpleQueue.sink  "number of queue nodes visited"  ETV
+2	1444 178 6 54 2.540824900056 23.242021797457 8 0 0 0 0
+vector 3  SimpleQueue.sink  "total service time"  ETV
+3	1622 282 6 54 2.540824900056 23.242021797457 8 0.309266962015 11.479008982622 22.042028598359 156.67996418396
+vector 4  SimpleQueue.sink  "total delay"  ETV
+4	1904 178 6 54 2.540824900056 23.242021797457 8 0 0 0 0
+vector 5  SimpleQueue.sink  "number of delay nodes visited"  ETV
+5	2082 178 6 54 2.540824900056 23.242021797457 8 0 0 0 0
+vector 6  SimpleQueue.sink  generation  ETV
+6	2260 178 6 54 2.540824900056 23.242021797457 8 0 0 0 0
+vector 7  SimpleQueue.queue  "dropped jobs"  ETV
+7	2438 183 34 48 13.778961019256 21.930040005669 8 1 8 36 204

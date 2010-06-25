@@ -1,0 +1,57 @@
+file 89778 2000000000                                           
+version 2
+run TokenRing1-0-20080514-18:19:44-3248
+attr configname TokenRing1
+attr datetime 20080514-18:19:44
+attr experiment TokenRing1
+attr inifile omnetpp.ini
+attr iterationvars ""
+attr iterationvars2 $repetition=0
+attr measurement ""
+attr network TokenRing
+attr processid 3248
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+vector 5  TokenRing.comp[0].mac  "Queue length (packets)"  ETV
+5	19900 4786 11 90651 0 2.367557999977 200 0 6 212 436
+vector 6  TokenRing.comp[0].mac  "Queue length (bytes)"  ETV
+6	24686 5173 11 90651 0 2.367557999977 200 0 9876 431522 1883502424
+vector 9  TokenRing.comp[1].mac  "Queue length (packets)"  ETV
+9	33522 4775 12 40385 0 2.256489999977 200 0 5 206 384
+vector 10  TokenRing.comp[1].mac  "Queue length (bytes)"  ETV
+10	38297 5383 12 40385 0 2.256489999977 200 0 14423 519214 2882841842
+vector 13  TokenRing.comp[2].mac  "Queue length (packets)"  ETV
+13	47436 4986 13 40423 0 2.274174999977 200 0 5 208 400
+vector 14  TokenRing.comp[2].mac  "Queue length (bytes)"  ETV
+14	52422 5392 13 40423 0 2.274174999977 200 0 18531 515206 3188093862
+vector 17  TokenRing.comp[3].mac  "Queue length (packets)"  ETV
+17	61574 4972 14 40228 0 2.191032999978 200 0 5 210 404
+vector 18  TokenRing.comp[3].mac  "Queue length (bytes)"  ETV
+18	66546 5371 14 40228 0 2.191032999978 200 0 11227 453892 2172912218
+vector 21  TokenRing.comp[4].mac  "Queue length (packets)"  ETV
+21	75670 4980 15 40461 0 2.295900999977 200 0 6 210 424
+vector 22  TokenRing.comp[4].mac  "Queue length (bytes)"  ETV
+22	80650 5376 15 40461 0 2.295900999977 200 0 10777 456202 2182790596
+vector 11  TokenRing.comp[1].mac  "Queueing time (sec)"  ETV
+11	43680 3756 16 40385 0.000001 2.256489999977 100 1e-06 0.116342795659 2.109777110329 0.090219341885112
+vector 15  TokenRing.comp[2].mac  "Queueing time (sec)"  ETV
+15	57814 3760 23 40423 0.005468 2.274174999977 100 4.16703e-07 0.099072758223 2.180114144047 0.084034310341256
+vector 4  TokenRing.comp[4].sink  "End-to-End Delay"  ETV
+4	15795 4105 27 48578 0.00547 2.320820999977 113 0.000468374056 0.121347243 3.06132729716 0.14100200303309
+vector 19  TokenRing.comp[3].mac  "Queueing time (sec)"  ETV
+19	71917 3753 32 40228 0.009325 2.191032999978 100 2.08859e-07 0.109167236295 2.133476817148 0.081308743947416
+vector 23  TokenRing.comp[4].mac  "Queueing time (sec)"  ETV
+23	86026 3752 42 40461 0.013306 2.295900999977 100 2.95532e-06 0.123487751539 2.287582239472 0.10480541974956
+vector 0  TokenRing.comp[0].sink  "End-to-End Delay"  ETV
+0	1585 3016 56 40456 0.022021 2.293933999977 83 0.001888091535 0.070676540498 1.90169318283 0.065669200770729
+vector 7  TokenRing.comp[0].mac  "Queueing time (sec)"  ETV
+7	29859 3663 68 90651 0.029187 2.367557999977 100 2.49698e-07 0.135843238013 2.310070448828 0.10915349717601
+vector 3  TokenRing.comp[3].sink  "End-to-End Delay"  ETV
+3	11861 3934 73 40491 0.02919 2.306070999977 107 0.001229364805 0.131303751539 3.03834559013 0.14517587798314
+vector 1  TokenRing.comp[1].sink  "End-to-End Delay"  ETV
+1	4601 4402 89 74445 0.034394 2.351353999977 119 7.3015289e-05 0.140878238013 3.374151120498 0.15047107833009
+vector 2  TokenRing.comp[2].sink  "End-to-End Delay"  ETV
+2	9003 2858 165 90661 0.063856 2.369659999976 78 0.002105220735 0.119943795659 1.930759569182 0.08071705085749

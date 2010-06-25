@@ -1,0 +1,446 @@
+
+\section{File Format Definition}
+
+The file format described here applies to \textit{both output vector and
+output scalar files}. Their formats are consistent, only the types of
+entries occurring in them are different. This unified format also
+means that they can be read with a common routine.
+
+Result files are \textit{line oriented text files}. A line consists of
+one or more tokens, separated by whitespace. Tokens either do not
+contain whitespace, or whitespace is escaped using a backslash, or
+are quoted using double quotes. Escaping within quotes using
+backslashes is also permitted.
+
+The first token of a line usually identifies the type of the entry. A
+notable exception is an output vector data line, which begins with a
+numeric identifier of the given output vector.
+
+A line starting with \# as the first non{}-whitespace character denotes
+a comment, and is to be ignored during processing.
+
+Result files are written from simulation runs. A simulation run
+generates a physically contiguous set of lines into one or more result
+files. (That is, lines from different runs do not arbitrarily mix in
+the files.)
+
+A run is identified by a unique textual \textit{run ID}, which appears in
+all result files written during that run. The run ID may appear on the
+user interface, so it should be somewhat meaningful to the user.
+Nothing should be assumed about the particular format of run ID, but it
+will be some string concatenated from the simulated network's name, the
+time/date, the hostname, and other pieces of data to make it unique.
+
+A simulation run will typically write into two result files (.vec and
+.sca). However, when using parallel distributed simulation, the user
+will end up with several .vec and .sca files, because different
+partitions (a separate process each) will write into different files.
+However, all these files will contain the same run ID, so it is possible
+to relate data that belong together.
+
+Entry types are:
+
+\begin{itemize}
+    \item \textbf{version}: result file version
+    \item \textbf{run}: simulation run identifier
+    \item \textbf{attr}: run, vector, scalar or statistics object attribute
+    \item \textbf{param}: module parameter
+    \item \textbf{scalar}: scalar data
+    \item \textbf{vector}: vector declaration
+    \item \textit{vector-id}: vector data
+    \item \textbf{file}: vector file attributes
+    \item \textbf{statistic}: statistics object
+    \item \textbf{field}: field of a statistics object
+    \item \textbf{bin}: histogram bin
+\end{itemize}
+
+The following sections describe each entry type in detail.
+
+\subsection{Version}
+
+Specifies the format of the result file. It is written at the beginning of the file.
+
+Syntax:
+
+\hspace{20mm} \textbf{version} \textit{versionNumber}
+
+The version described in this document is 2. Version 1 files are produced
+by OMNeT++ 3.3 or earlier.
+
+
+
+\subsection{Run Declaration}
+
+Marks the beginning of a new run in the file. Entries after this line
+belong to this run.
+
+Syntax:
+
+\hspace{20mm} \textbf{run} \textit{runID}
+
+Example:
+
+\begin{verbatim}
+run TokenRing1-0-20080514-18:19:44-3248
+\end{verbatim}
+
+Typically there will be one run per file, but this is not mandatory.
+In cases when there are more than one run in a file and it is not feasible
+to keep the entire file in memory during analysis, the offsets of the \textit{run}
+lines may be indexed for more efficient random access.
+
+The \textit{run} line may be immediately followed by \textit{attribute} lines.
+Attributes may store generic data like the network name, date/time of running
+the simulation, configuration options that took effect for the simulation, etc.
+
+Run attribute names used by OMNeT++ include the following:
+
+Generic attribute names:
+
+\begin{itemize}
+    \item \textbf{network}: name of the network simulated
+    \item \textbf{datetime}: date/time associated with the run
+    \item \textbf{processid}: the PID of the simulation process
+    \item \textbf{inifile}: the main configuration file
+    \item \textbf{configname}: name of the inifile configuration
+    \item \textbf{seedset}: index of the seed-set use for the simulation
+\end{itemize}
+
+Attributes associated with parameter studies (iterated runs):
+
+\begin{itemize}
+    \item \textbf{runnumber}: the run number within the parameter study
+    \item \textbf{experiment}: experiment label
+    \item \textbf{measurement}: measurement label
+    \item \textbf{replication}: replication label
+    \item \textbf{repetition}: the loop counter for repetitions with different seeds
+    \item \textbf{iterationvars}: string containing the values of the iteration variables
+    \item \textbf{iterationvars2}: string containing the values of the iteration variables
+\end{itemize}
+
+
+An example run header:
+
+\begin{verbatim}
+run TokenRing1-0-20080514-18:19:44-3248
+attr configname TokenRing1
+attr datetime 20080514-18:19:44
+attr experiment TokenRing1
+attr inifile omnetpp.ini
+attr iterationvars ""
+attr iterationvars2 $repetition=0
+attr measurement ""
+attr network TokenRing
+attr processid 3248
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+\end{verbatim}
+
+
+
+\subsection{Attributes}
+
+Contains an attribute for the preceding run, vector, scalar or
+statistics object. Attributes can be used for saving arbitrary
+extra information for objects; processors should ignore unrecognized
+attributes.
+
+Syntax:
+
+\hspace{20mm} \textbf{attr} \textit{name} \textit{value}
+
+Example:
+
+\begin{verbatim}
+attr network "largeNet"
+\end{verbatim}
+
+
+
+\subsection{Module Parameters}
+
+Contains a module parameter value for the given run. This is needed so
+that module parameters may be included in the analysis (e.g. to
+identify the load for a ``throughput vs load'' plot).
+
+It may not be practical to simply store all parameters of all modules in the
+result file, because there may be too many. We assume that NED files are
+invariant and do not store parameters defined in them. However, we store
+parameter assignments that come from \ttt{omnetpp.ini}, in their original
+wildcard form (i.e. not expanded) to conserve space. Parameter values
+entered interactively by the user are also stored.
+
+When the original NED files are present, it should thus be possible to
+reconstruct all parameters for the given simulation.
+
+Syntax:
+
+\hspace{20mm} \textbf{param} \textit{parameterNamePattern} \textit{value}
+
+Example:
+
+\begin{verbatim}
+param **.gen.sendIaTime  exponential(0.01)
+param **.gen.msgLength   10
+param **.fifo.bitsPerSec 1000
+\end{verbatim}
+
+
+
+\subsection{Scalar Data}
+
+Contains an output scalar value.
+
+Syntax:
+
+\hspace{20mm} \textbf{scalar} \textit{moduleName} \textit{scalarName} \textit{value}
+
+Examples:
+
+\begin{verbatim}
+scalar "net.switchA.relay" "processed frames" 100
+\end{verbatim}
+
+Scalar lines may be immediately followed by \textit{attribute} lines.
+OMNeT++ uses the following attributes for scalars:
+
+\begin{itemize}
+    \item \textbf{title}: suggested title on charts
+    \item \textbf{unit}: measurement unit, e.g. \ttt{s} for seconds
+\end{itemize}
+
+
+
+\subsection{Vector Declaration}
+
+Defines an output vector.
+
+Syntax:
+
+\hspace{20mm} \textbf{vector} \textit{vectorId} \textit{moduleName} \textit{vectorName}
+
+\hspace{20mm} \textbf{vector} \textit{vectorId} \textit{moduleName} \textit{vectorName} \textit{columnSpec}
+
+Where \textit{columnSpec} is a string, encoding the meaning and ordering
+the columns of data lines. Characters of the string mean:
+
+\begin{itemize}
+  \item \textbf{E} event number
+  \item \textbf{T} simulation time
+  \item \textbf{V} vector value
+\end{itemize}
+
+Common values are \ttt{TV} and \ttt{ETV}. The default value is \ttt{TV}.
+
+Vector lines may be immediately followed by \textit{attribute} lines.
+OMNeT++ uses the following attributes for vectors:
+
+\begin{itemize}
+    \item \textbf{title}: suggested vector title on charts
+    \item \textbf{unit}: measurement unit, e.g. \ttt{s} for seconds
+    \item \textbf{enum}: symbolic names for values of the vector;
+          syntax is \ttt{"IDLE=0, BUSY=1, OFF=2"}
+    \item \textbf{type}: data type, one of \ttt{int}, \ttt{double} and \ttt{enum}
+    \item \textbf{interpolationmode}: hint for interpolation mode on the
+          chart: \ttt{none} (=do not connect the dots), \ttt{sample-hold},
+          \ttt{backward-sample-hold}, \ttt{linear}
+    \item \textbf{min}: minimum value
+    \item \textbf{max}: maximum value
+\end{itemize}
+
+
+
+\subsection{Vector Data}
+
+Adds a value to an output vector. This is the same as in older output
+vector files.
+
+Syntax:
+
+\hspace{20mm} \textit{vectorId} \textit{column1} \textit{column2} ...
+
+Simulation times and event numbers \textit{within an output vector} are
+required to be in increasing order.
+
+Performance note: Data lines belonging to the same output vector may be
+written out in clusters (of size roughly a multiple of the disk's
+physical block size). Then, since an output vector file is typically
+not kept in memory during analysis, indexing the start offsets of these
+clusters allows one to read the file and seek in it more efficiently.
+This does not require any change or extension to the file format.
+
+
+
+\subsection{Index Header}
+
+The first line of the index file stores the size and modification date
+of the vector file. If the attributes of a vector file differ from
+the information stored in the index file, then the IDE automatically
+rebuilds the index file.
+
+Syntax:
+
+\hspace{20mm} \textbf{file} \textit{filesize} \textit{modificationDate}
+
+
+
+\subsection{Index Data}
+
+Stores the location and statistics of blocks in the vector file.
+
+Syntax:
+
+\hspace{20mm} {\textit{vectorId offset length firstEventNo lastEventNo
+                       firstSimtime lastSimtime count min max sum sqrsum}}
+
+where
+
+\begin{itemize}
+    \item\textit{offset}: the start offset of the block
+    \item\textit{length}: the length of the block
+    \item\textit{firstEventNo}, \textit{lastEventNo}:
+        the event number range of the block (optional)
+    \item\textit{firstSimtime}, \textit{lastSimtime}:
+        the simtime range of the block
+    \item\textit{count, min, max, sum, sqrsum}:
+        collected statistics of the values in the block
+
+\end{itemize}
+
+
+
+\subsection{Statistics Object}
+
+Represents a statistics object.
+
+Syntax:
+
+\hspace{20mm} \textbf{statistic} \textit{moduleName} \textit{statisticName}
+
+Example:
+
+\begin{verbatim}
+statistic Aloha.server 	"collision multiplicity"
+\end{verbatim}
+
+A \textit{statistic} line may be followed by \textit{field} and \textit{attribute} lines,
+and a series of \textit{bin} lines that represent histogram data.
+
+OMNeT++ uses the following attributes:
+
+\begin{itemize}
+    \item \textbf{title}: suggested title on charts
+    \item \textbf{unit}: measurement unit, e.g. \ttt{s} for seconds
+    \item \textbf{type}: type of the collected values: \ttt{int} or \ttt{double};
+                         the default is \ttt{double}
+\end{itemize}
+
+A full example with fields, attributes and histogram bins:
+
+\begin{verbatim}
+statistic Aloha.server 	"collision multiplicity"
+field count 13908
+field mean 6.8510209951107
+field stddev 5.2385484477843
+field sum 95284
+field sqrsum 1034434
+field min 2
+field max 65
+attr type int
+attr unit packets
+bin	-INF	0
+bin	0	0
+bin	1	0
+bin	2	2254
+bin	3	2047
+bin	4	1586
+bin	5	1428
+bin	6	1101
+bin	7	952
+bin	8	785
+...
+bin	52	2
+\end{verbatim}
+
+
+
+\subsection{Field}
+
+Represents a field in a statistics object.
+
+Syntax:
+
+\hspace{20mm} \textbf{field} \textit{fieldName} \textit{value}
+
+Example:
+
+\begin{verbatim}
+field sum 95284
+\end{verbatim}
+
+Fields:
+
+\begin{itemize}
+    \item \tbf{count}: observation count
+    \item \tbf{mean}: mean of the observations
+    \item \tbf{stddev}: standard deviation
+    \item \tbf{sum}: sum of the observations
+    \item \tbf{sqrsum}: sum of the squared observations
+    \item \tbf{min}: minimum of the observations
+    \item \tbf{max}: maximum of the observations
+\end{itemize}
+
+For weighted statistics, additionally the following fields may be recorded:
+
+\begin{itemize}
+    \item \tbf{weights}: sum of the weights
+    \item \tbf{weightedSum}: the weighted sum of the observations
+    \item \tbf{sqrSumWeights}:  sum of the squared weights
+    \item \tbf{weightedSqrSum}: weighted sum of the squared observations
+\end{itemize}
+
+
+
+\subsection{Histogram Bin}
+
+Represents a bin in a histogram object.
+
+Syntax:
+
+\hspace{20mm} \textbf{bin} \textit{binLowerBound} \textit{value}
+
+Histogram name and module is defined on the \textbf{statistic} line,
+which is followed by several \textbf{bin} lines to contain data. Any
+non{}-\textbf{bin} line marks the end of the histogram data.
+
+The \textit{binLowerBound} column of \textbf{bin} lines represent the
+(inclusive) lower bound of the given histogram cell. \textbf{Bin} lines are in
+increasing \textit{binLowerBound} order.
+
+The \textit{value} column of a \textbf{bin} line represents the observation
+count in the given cell: \textit{value k} is the number of observations
+greater or equal to \textit{binLowerBound k}, but smaller than
+\textit{binLowerBound k+1}. \textit{Value} is not necessarily an
+integer, because some density estimation algorithms (e.g. $P^2$) produce
+non{}-integer estimates. The first \textbf{bin} line is the underflow
+cell, and the last \textbf{bin} line is the overflow cell.
+
+
+Example:
+
+\begin{verbatim}
+bin -INF  0
+bin 0 4
+bin 2 6
+bin 4 2
+bin 6 1
+\end{verbatim}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "main"
+%%% End:
