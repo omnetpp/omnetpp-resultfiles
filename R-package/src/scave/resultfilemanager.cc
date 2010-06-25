@@ -971,8 +971,6 @@ void ResultFileManager::processLine(char **vec, int numTokens, sParseContext &ct
             ctx.fileRunRef = addFileRun(ctx.fileRef, runRef);
         }
         ctx.lastResultItemType = 0;
-        ctx.lastResultItemIndex = -1;
-        ctx.clearHistogram();
         return;
     }
     else if (vec[0][0] == 'v' && strcmp(vec[0], "version") == 0)
@@ -1011,8 +1009,7 @@ void ResultFileManager::processLine(char **vec, int numTokens, sParseContext &ct
         CHECK(parseDouble(vec[3],value), "invalid scalar file syntax: invalid value column");
 
         ctx.lastResultItemType = SCALAR;
-        ctx.lastResultItemIndex = addScalar(ctx.fileRunRef, vec[1], vec[2], value, false);
-        ctx.clearHistogram();
+        addScalar(ctx.fileRunRef, vec[1], vec[2], value, false);
     }
     else if (vec[0][0]=='v' && !strcmp(vec[0],"vector"))
     {
@@ -1023,25 +1020,26 @@ void ResultFileManager::processLine(char **vec, int numTokens, sParseContext &ct
         const char *columns = (numTokens < 5 || opp_isdigit(vec[4][0]) ? "TV" : vec[4]);
 
         ctx.lastResultItemType = VECTOR;
-        ctx.lastResultItemIndex = addVector(ctx.fileRunRef, vectorId, vec[2], vec[3], columns);
-        ctx.clearHistogram();
+        addVector(ctx.fileRunRef, vectorId, vec[2], vec[3], columns);
     }
     else if (vec[0][0]=='s' && !strcmp(vec[0],"statistic"))
     {
         // syntax: "statistic <module> <statisticname>"
         CHECK(numTokens>=3, "invalid scalar file: too few items on `statistic' line");
 
-        ctx.clearHistogram();
-        ctx.moduleName = vec[1];
-        ctx.statisticName = vec[2];
-        ctx.lastResultItemType = SCALAR; // add scalars first
-        ctx.lastResultItemIndex = ctx.fileRef->scalarResults.size();
+        const char *moduleName = vec[1];
+        const char *statisticName = vec[2];
 
-        CHECK(!ctx.moduleName.empty(), "invalid scalar file: missing module name");
-        CHECK(!ctx.statisticName.empty(), "invalid scalar file: missing statistics name");
+        Statistics stat;
+        StringMap attrs;
+        HistogramFields fields;
+        ctx.lastResultItemType = HISTOGRAM;
+        addHistogram(ctx.fileRunRef, moduleName, statisticName, stat, attrs, fields);
     }
     else if (vec[0][0]=='f' && !strcmp(vec[0],"field"))
     {
+        CHECK(ctx.lastResultItemType == HISTOGRAM, "invalid scalar file: missing statistic declaration")
+
         // syntax: "field <name> <value>"
         CHECK(numTokens>=3, "invalid scalar file: too few items on `field' line");
 
@@ -1049,50 +1047,39 @@ void ResultFileManager::processLine(char **vec, int numTokens, sParseContext &ct
         double value;
         CHECK(parseDouble(vec[2], value), "invalid scalar file: invalid field value");
 
-        CHECK(!ctx.moduleName.empty() && !ctx.statisticName.empty(),
-                "invalid scalar file: missing statistics declaration");
+        Assert(!ctx.fileRef->histogramResults.empty());
+        HistogramResult &histogram = ctx.fileRef->histogramResults.back();
+        histogram.fields[fieldName] = value;
 
-        ctx.fields[fieldName] = value;
-
-        std::string scalarName = ctx.statisticName + ":" + fieldName;
-
-        // set statistics field in the current histogram
-        bool isField = true;
+        // set histogram.stat fields
+        Statistics &stat = histogram.stat;
         if (fieldName == "count")
-            ctx.count = (long)value;
+            stat._count = (long)value;
         else if (fieldName == "min")
-            ctx.min = value;
+            stat._min = value;
         else if (fieldName == "max")
-            ctx.max = value;
+            stat._max = value;
         else if (fieldName == "sum")
-            ctx.sum = value;
+            stat._sum = value;
         else if (fieldName == "sqrsum")
-            ctx.sumSqr = value;
-        else if (fieldName != "mean" && fieldName != "stddev")
-            isField = false;
+            stat._sumSqr = value;
 
-        addScalar(ctx.fileRunRef, ctx.moduleName.c_str(), scalarName.c_str(), value, isField);
+        // add field as scalar too
+        std::string scalarName = (*histogram.nameRef) + ":" + fieldName;
+        addScalar(ctx.fileRunRef, histogram.moduleNameRef->c_str(), scalarName.c_str(), value, true);
     }
     else if (vec[0][0]=='b' && !strcmp(vec[0],"bin"))
     {
+        CHECK(ctx.lastResultItemType == HISTOGRAM, "invalid scalar file: missing statistic declaration")
+
         // syntax: "bin <lower_bound> <value>"
         CHECK(numTokens>=3, "");
         double lower_bound, value;
         CHECK(parseDouble(vec[1], lower_bound), "");
         CHECK(parseDouble(vec[2], value), "");
 
-        if (ctx.lastResultItemType != HISTOGRAM)
-        {
-            CHECK(ctx.lastResultItemType == SCALAR && !ctx.moduleName.empty() && !ctx.statisticName.empty(),
-                    "invalid scalar file: missing statistics declaration");
-            Statistics stat(ctx.count, ctx.min, ctx.max, ctx.sum, ctx.sumSqr);
-            const ScalarResults &scalars = ctx.fileRef->scalarResults;
-            const StringMap &attrs = ctx.lastResultItemIndex < (int)scalars.size() ?
-                                        scalars[ctx.lastResultItemIndex].attributes : StringMap();
-            ctx.lastResultItemType = HISTOGRAM;
-            ctx.lastResultItemIndex = addHistogram(ctx.fileRunRef, ctx.moduleName.c_str(), ctx.statisticName.c_str(), stat, attrs, ctx.fields);
-        }
-        HistogramResult &histogram = ctx.fileRef->histogramResults[ctx.lastResultItemIndex];
+        Assert(!ctx.fileRef->histogramResults.empty());
+        HistogramResult &histogram = ctx.fileRef->histogramResults.back();
         histogram.addBin(lower_bound, value);
     }
     else if (vec[0][0]=='a' && !strcmp(vec[0],"attr"))
@@ -1115,23 +1102,20 @@ void ResultFileManager::processLine(char **vec, int numTokens, sParseContext &ct
             if (attrName == "runNumber")
                 CHECK(parseInt(vec[2], ctx.fileRunRef->runRef->runNumber), "invalid result file: int value expected as runNumber");
         }
-        else if (ctx.lastResultItemIndex >= 0) // resultItem attribute
+        else if (ctx.lastResultItemType == SCALAR)
         {
-            if (ctx.lastResultItemType == SCALAR)
-                for (int i=ctx.lastResultItemIndex; i < (int)ctx.fileRef->scalarResults.size() ;++i)
-                {
-                    ctx.fileRef->scalarResults[i].attributes[attrName] = attrValue;
-                }
-            else if (ctx.lastResultItemType == VECTOR)
-                for (int i=ctx.lastResultItemIndex; i < (int)ctx.fileRef->vectorResults.size() ;++i)
-                {
-                    ctx.fileRef->vectorResults[i].attributes[attrName] = attrValue;
-                }
-            else if (ctx.lastResultItemType == HISTOGRAM)
-                for (int i=ctx.lastResultItemIndex; i < (int)ctx.fileRef->histogramResults.size() ;++i)
-                {
-                    ctx.fileRef->histogramResults[i].attributes[attrName] = attrValue;
-                }
+            Assert(!ctx.fileRef->scalarResults.empty());
+            ctx.fileRef->scalarResults.back().attributes[attrName] = attrValue;
+        }
+        else if (ctx.lastResultItemType == VECTOR)
+        {
+            Assert(!ctx.fileRef->vectorResults.empty());
+            ctx.fileRef->vectorResults.back().attributes[attrName] = attrValue;
+        }
+        else if (ctx.lastResultItemType == HISTOGRAM)
+        {
+            Assert(!ctx.fileRef->histogramResults.empty());
+            ctx.fileRef->histogramResults.back().attributes[attrName] = attrValue;
         }
     }
     else if (vec[0][0]=='p' && !strcmp(vec[0],"param"))

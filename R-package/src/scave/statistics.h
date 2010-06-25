@@ -34,12 +34,16 @@
 
 NAMESPACE_BEGIN
 
+class ResultFileManager;
+
 /**
  * Class for collecting statistical data of the result
  * used in several places in Scave.
  */
 class SCAVE_API Statistics
 {
+    friend class ResultFileManager;
+
     private:
         long _count;
         double _min;

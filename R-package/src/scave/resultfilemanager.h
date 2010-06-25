@@ -291,33 +291,12 @@ class SCAVE_API ResultFileManager
         const char *fileName; /*in*/
         int64 lineNo; /*inout*/
         FileRun *fileRunRef; /*inout*/
-        // references to the result items which attributes should be added to
+        // type of the last result item which attributes should be added to
         int lastResultItemType; /*inout*/
-        int lastResultItemIndex; /*inout*/
-        // collected fields of the histogram to be created when the
-        // first 'bin' is parsed
-        std::string moduleName;
-        std::string statisticName;
-        HistogramFields fields;
-        long count;
-        double min, max, sum, sumSqr;
 
         sParseContext(ResultFile *fileRef)
             : fileRef(fileRef), fileName(fileRef->filePath.c_str()), lineNo(0),
-              fileRunRef(NULL), lastResultItemType(0), lastResultItemIndex(-1),
-              count(0), min(POSITIVE_INFINITY), max(NEGATIVE_INFINITY), sum(0.0), sumSqr(0.0) {}
-
-        void clearHistogram()
-        {
-            moduleName.clear();
-            statisticName.clear();
-            fields.clear();
-            count = 0;
-            min = POSITIVE_INFINITY;
-            max = NEGATIVE_INFINITY;
-            sum = 0.0;
-            sumSqr = 0.0;
-        }
+              fileRunRef(NULL), lastResultItemType(0) {}
     };
 
   public:
