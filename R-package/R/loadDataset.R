@@ -44,7 +44,7 @@ loadDataset <- function(files, ...) {
   structure(
     list(
       runs = as.data.frame(dataset$runs),
-      files = as.data.frame(dataset$files),
+      fileruns = as.data.frame(dataset$fileruns),
       scalars = as.data.frame(dataset$scalars),
       vectors = as.data.frame(dataset$vectors),
       histograms = as.data.frame(dataset$histograms),
@@ -53,8 +53,7 @@ loadDataset <- function(files, ...) {
       params = as.data.frame(dataset$params),
       attributes = as.data.frame(dataset$attributes)
     ),
-    class='omnetpp_dataset',
-    commands=commands
+    class='omnetpp_dataset'
   )
 }
 

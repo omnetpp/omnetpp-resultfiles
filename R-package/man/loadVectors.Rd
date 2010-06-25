@@ -35,7 +35,7 @@
 
 \usage{loadVectors(vectors, \dots)}
 \arguments{
-	\item{vectors}{a dataframe with (ospath,vectorid) columns.}
+	\item{vectors}{a dataframe with (file,vectorid) columns.}
     \item{\dots}{The operations describing further processing of the vectors. The arguments are not evaluated.}
 }
 
@@ -97,8 +97,6 @@ d <- loadDataset(c('Aloha.sca', 'PureAloha1-*.vec'),
        add(type='scalar', select='module(Aloha.server)'),
        add('vector'))
 
-vectorids = merge(d$files, d$vectors)[,c('ospath','vectorid')]
-
-loadVectors(vectorids, compute(winavg(windowSize=10), select='name("channel utilization")'))
+loadVectors(d$vectors, compute(winavg(windowSize=10), select='name("channel utilization")'))
 }
 \keyword{file}

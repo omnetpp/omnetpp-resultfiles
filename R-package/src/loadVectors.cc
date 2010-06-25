@@ -123,10 +123,10 @@ static ProcessingOperationList parseProcessingOperations(SEXP commands)
 static Vectors loadVectors(SEXP vectors, SEXP commands, ResultFileManager &manager)
 {
     Vectors vs;
-    SEXP ospaths = getElementByName(vectors, "ospath");
-    if (!IS_CHARACTER(ospaths))
+    SEXP files = getElementByName(vectors, "file");
+    if (!IS_CHARACTER(files))
     {
-        error("vectors$ospath is not a character vector: %d", (int)TYPEOF(ospaths));
+        error("vectors$file is not a character vector: %d", (int)TYPEOF(files));
         return vs;
     }
 
@@ -138,9 +138,9 @@ static Vectors loadVectors(SEXP vectors, SEXP commands, ResultFileManager &manag
     }
 
     int vectorCount = GET_LENGTH(vectorids);
-    if (GET_LENGTH(ospaths) != vectorCount)
+    if (GET_LENGTH(files) != vectorCount)
     {
-        error("vectors$ospath and vectors$vectorid have different lengths");
+        error("vectors$file and vectors$vectorid have different lengths");
         return vs;
     }
 
@@ -148,7 +148,7 @@ static Vectors loadVectors(SEXP vectors, SEXP commands, ResultFileManager &manag
     IDList idlist;
     for (int i = 0; i < vectorCount; ++i)
     {
-        const char *ospath = CHAR(STRING_ELT(ospaths, i));
+        const char *ospath = CHAR(STRING_ELT(files, i));
         int vectorid = INTEGER(vectorids)[i];
         ResultFile *resultFile = manager.loadFile(ospath);
         ID id = manager.getVectorById(resultFile, vectorid);
@@ -187,7 +187,7 @@ static Vectors loadVectors(SEXP vectors, SEXP commands, ResultFileManager &manag
 static const char* datasetColumnNames[] = {"vectors", "vectordata", "attributes"};
 static const int datasetColumnsLength = sizeof(datasetColumnNames) / sizeof(const char*);
 
-static const char* vectorColumnNames[] = {"vector_key", "ospath", "vectorid", "module", "name"};
+static const char* vectorColumnNames[] = {"vector_key", "file", "vectorid", "module", "name"};
 static const SEXPTYPE vectorColumnTypes[] = {INTSXP, STRSXP, INTSXP, STRSXP, STRSXP};
 static const int vectorColumnsLength = sizeof(vectorColumnNames) / sizeof(const char*);
 
@@ -210,7 +210,7 @@ static SEXP exportVectors(const ResultFileManager &manager, const Vectors &vecs)
     int vectordataCount = 0, attrCount = 0;
     SEXP vectors = createDataFrame(vectorColumnNames, vectorColumnTypes, vectorColumnsLength, vectorCount);
     SEXP vectorKey = VECTOR_ELT(vectors, 0);
-    SEXP ospath = VECTOR_ELT(vectors, 1);
+    SEXP file = VECTOR_ELT(vectors, 1);
     SEXP vectorid = VECTOR_ELT(vectors, 2);
     SEXP module = VECTOR_ELT(vectors, 3);
     SEXP name = VECTOR_ELT(vectors, 4);
@@ -224,7 +224,7 @@ static SEXP exportVectors(const ResultFileManager &manager, const Vectors &vecs)
         vectordataCount += vecs[i].array->length();
 
         INTEGER(vectorKey)[i] = i;
-        SET_STRING_ELT(ospath, i, mkChar(vector.fileRunRef->fileRef->fileSystemFilePath.c_str()));
+        SET_STRING_ELT(file, i, mkChar(vector.fileRunRef->fileRef->fileSystemFilePath.c_str()));
         INTEGER(vectorid)[i] = vector.vectorId;
         SET_STRING_ELT(module, i, mkChar(vector.moduleNameRef->c_str()));
         SET_STRING_ELT(name, i, mkChar(vector.nameRef->c_str()));

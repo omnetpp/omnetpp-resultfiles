@@ -36,14 +36,14 @@ dataset <- loadDataset(vectorFiles)
 #
 # Load data of all vectors.
 #
-data <- loadVectors(dataset)
+data <- loadVectors(dataset$vectors)
 print(data$vectors[,c('module','name')])
 
 #
 # Load queueing times from the TokenRing simulation and compute their winavg too.
 #
 dataset <- loadDataset(vectorFiles, add(select='module("TokenRing.comp[*].mac") AND name("Queueing time (sec)")'))
-data <- loadVectors(dataset, compute(winavg(windowSize=10)))
+data <- loadVectors(dataset$vectors, compute(winavg(windowSize=10)))
 print(data$vectors[,c('module','name')])
 
 #

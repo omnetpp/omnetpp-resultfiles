@@ -212,27 +212,27 @@ static IDList filterIDListByType(const IDList &idlist, int type, const ResultFil
     return result;
 }
 
-static const char* datasetColumnNames[] = {"runs", "files", "scalars", "vectors", "histograms", "fields", "bins", "params", "attributes"};
+static const char* datasetColumnNames[] = {"runs", "fileruns", "scalars", "vectors", "histograms", "fields", "bins", "params", "attributes"};
 static const int datasetColumnsLength = sizeof(datasetColumnNames) / sizeof(const char*);
 
 const char* runColumnNames[] = {"run_key", "runid", "experiment", "measurement", "replication"};
 const SEXPTYPE runColumnTypes[] = {INTSXP, STRSXP, STRSXP, STRSXP, STRSXP};
 const int runColumnsLength = sizeof(runColumnNames) / sizeof(const char*);
 
-const char* fileColumnNames[] = {"file_key", "directory", "filename", "ospath"};
-const SEXPTYPE fileColumnTypes[] = {INTSXP, STRSXP, STRSXP, STRSXP};
-const int fileColumnsLength = sizeof(fileColumnNames) / sizeof(const char*);
+const char* filerunColumnNames[] = {"run_key", "file"};
+const SEXPTYPE filerunColumnTypes[] = {INTSXP, STRSXP};
+const int filerunColumnsLength = sizeof(filerunColumnNames) / sizeof(const char*);
 
-const char* scalarColumnNames[] = {"scalar_key", "run_key", "file_key", "module", "name", "value"};
-const SEXPTYPE scalarColumnTypes[] = {INTSXP, INTSXP, INTSXP, STRSXP, STRSXP, REALSXP};
+const char* scalarColumnNames[] = {"scalar_key", "run_key", "file", "module", "name", "value"};
+const SEXPTYPE scalarColumnTypes[] = {INTSXP, INTSXP, STRSXP, STRSXP, STRSXP, REALSXP};
 const int scalarColumnsLength = sizeof(scalarColumnNames) / sizeof(const char*);
 
-const char* vectorColumnNames[] = {"vector_key", "run_key", "file_key", "vectorid", "module", "name"};
-const SEXPTYPE vectorColumnTypes[] = {INTSXP, INTSXP, INTSXP, INTSXP, STRSXP, STRSXP};
+const char* vectorColumnNames[] = {"vector_key", "run_key", "file", "vectorid", "module", "name"};
+const SEXPTYPE vectorColumnTypes[] = {INTSXP, INTSXP, STRSXP, INTSXP, STRSXP, STRSXP};
 const int vectorColumnsLength = sizeof(vectorColumnNames) / sizeof(const char*);
 
-const char* histogramColumnNames[] = {"histogram_key", "run_key", "file_key", "module", "name"};
-const SEXPTYPE histogramColumnTypes[] = {INTSXP, INTSXP, INTSXP, STRSXP, STRSXP};
+const char* histogramColumnNames[] = {"histogram_key", "run_key", "file", "module", "name"};
+const SEXPTYPE histogramColumnTypes[] = {INTSXP, INTSXP, STRSXP, STRSXP, STRSXP};
 const int histogramColumnsLength = sizeof(histogramColumnNames) / sizeof(const char*);
 
 const char* fieldColumnNames[] = {"histogram_key", "name", "value"};
@@ -251,7 +251,6 @@ const char* attributeColumnNames[] = {"type", "key", "name", "value"};
 const SEXPTYPE attributeColumnTypes[] = {STRSXP, INTSXP, STRSXP, STRSXP};
 const int attributeColumnsLength = sizeof(attributeColumnNames) / sizeof(const char*);
 
-// TODO filerun
 SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
 {
     int paramsCount = 0, attrCount = 0;
@@ -286,26 +285,23 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
         SET_STRING_ELT(replication, i, (replicationStr != NULL ? mkChar(replicationStr) : NA_STRING));
     }
 
-    // files
-    std::map<ResultFile*,int> fileIndex;
-    const ResultFileList &fileList = manager.getFiles();
-    int fileCount = fileList.size();
-    SEXP files = createDataFrame(fileColumnNames, fileColumnTypes, fileColumnsLength, fileCount);
-    SEXP fileKey = VECTOR_ELT(files, 0), directory = VECTOR_ELT(files,1), fileName=VECTOR_ELT(files, 2), ospath=VECTOR_ELT(files, 3);
-    SET_ELEMENT(dataset, 1, files);
-    UNPROTECT(1); // files
-    for (int i = 0; i < fileCount; ++i)
+    // fileruns
+    FileRunList *filerunList = manager.getUniqueFileRuns(idlist);
+    int filerunCount = filerunList->size();
+    SEXP fileruns = createDataFrame(filerunColumnNames, filerunColumnTypes, filerunColumnsLength, filerunCount);
+    runKey = VECTOR_ELT(fileruns, 0);
+    SEXP file =VECTOR_ELT(fileruns, 1);
+    SET_ELEMENT(dataset, 1, fileruns);
+    UNPROTECT(1); // fileruns
+    for (int i = 0; i < filerunCount; ++i)
     {
-        ResultFile *filePtr = fileList[i];
-        fileIndex[filePtr] = i;
-        const char *directoryStr = filePtr->directory.c_str();
-        const char *filenameStr = filePtr->fileName.c_str();
-        const char *ospathStr = filePtr->fileSystemFilePath.c_str();
-        INTEGER(fileKey)[i] = i;
-        SET_STRING_ELT(directory, i, mkChar(directoryStr));
-        SET_STRING_ELT(fileName, i, mkChar(filenameStr));
-        SET_STRING_ELT(ospath, i, mkChar(ospathStr));
+        FileRun *filerunPtr = filerunList->at(i);
+        Run *runPtr = filerunPtr->runRef;
+        const char *fileStr = filerunPtr->fileRef->fileSystemFilePath.c_str();
+        INTEGER(runKey)[i] = runIndex.find(runPtr)->second;
+        SET_STRING_ELT(file, i, mkChar(fileStr));
     }
+    delete filerunList;
 
     // scalars
     IDList scalarIDs = filterIDListByType(idlist, ResultFileManager::SCALAR, manager);
@@ -313,7 +309,7 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
     SEXP scalars = createDataFrame(scalarColumnNames, scalarColumnTypes, scalarColumnsLength, scalarCount);
     SEXP scalarKey = VECTOR_ELT(scalars, 0);
     runKey = VECTOR_ELT(scalars, 1);
-    fileKey = VECTOR_ELT(scalars, 2);
+    file = VECTOR_ELT(scalars, 2);
     SEXP module = VECTOR_ELT(scalars, 3);
     SEXP name = VECTOR_ELT(scalars, 4);
     SEXP value = VECTOR_ELT(scalars, 5);
@@ -327,7 +323,7 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
 
         INTEGER(scalarKey)[i] = i;
         INTEGER(runKey)[i] = runIndex.find(scalar.fileRunRef->runRef)->second;
-        INTEGER(fileKey)[i] = fileIndex.find(scalar.fileRunRef->fileRef)->second;
+        SET_STRING_ELT(file, i, mkChar(scalar.fileRunRef->fileRef->fileSystemFilePath.c_str()));
         SET_STRING_ELT(module, i, mkChar(scalar.moduleNameRef->c_str()));
         SET_STRING_ELT(name, i, mkChar(scalar.nameRef->c_str()));
         REAL(value)[i] = scalar.value;
@@ -339,7 +335,7 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
     SEXP vectors = createDataFrame(vectorColumnNames, vectorColumnTypes, vectorColumnsLength, vectorCount);
     SEXP vectorKey = VECTOR_ELT(vectors, 0);
     runKey = VECTOR_ELT(vectors, 1);
-    fileKey = VECTOR_ELT(vectors, 2);
+    file = VECTOR_ELT(vectors, 2);
     SEXP vectorid = VECTOR_ELT(vectors, 3);
     module = VECTOR_ELT(vectors, 4);
     name = VECTOR_ELT(vectors, 5);
@@ -353,7 +349,7 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
 
         INTEGER(vectorKey)[i] = i;
         INTEGER(runKey)[i] = runIndex.find(vector.fileRunRef->runRef)->second;
-        INTEGER(fileKey)[i] = fileIndex.find(vector.fileRunRef->fileRef)->second;
+        SET_STRING_ELT(file, i, mkChar(vector.fileRunRef->fileRef->fileSystemFilePath.c_str()));
         INTEGER(vectorid)[i] = vector.vectorId;
         SET_STRING_ELT(module, i, mkChar(vector.moduleNameRef->c_str()));
         SET_STRING_ELT(name, i, mkChar(vector.nameRef->c_str()));
@@ -365,7 +361,7 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
     SEXP histograms = createDataFrame(histogramColumnNames, histogramColumnTypes, histogramColumnsLength, histogramCount);
     SEXP histogramKey = VECTOR_ELT(histograms, 0);
     runKey = VECTOR_ELT(histograms, 1);
-    fileKey = VECTOR_ELT(histograms, 2);
+    file = VECTOR_ELT(histograms, 2);
     module = VECTOR_ELT(histograms, 3);
     name = VECTOR_ELT(histograms, 4);
     SET_ELEMENT(dataset, 4, histograms);
@@ -381,7 +377,7 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
 
         INTEGER(histogramKey)[i] = i;
         INTEGER(runKey)[i] = runIndex.find(histogram.fileRunRef->runRef)->second;
-        INTEGER(fileKey)[i] = fileIndex.find(histogram.fileRunRef->fileRef)->second;
+        SET_STRING_ELT(file, i, mkChar(histogram.fileRunRef->fileRef->fileSystemFilePath.c_str()));
         SET_STRING_ELT(module, i, mkChar(histogram.moduleNameRef->c_str()));
         SET_STRING_ELT(name, i, mkChar(histogram.nameRef->c_str()));
     }

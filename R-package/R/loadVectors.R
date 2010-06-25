@@ -140,11 +140,7 @@ compute <- function (fun, select) {
 }
 
 loadVectors <- function (vectors, ...) {
-  if (class(vectors) == 'omnetpp_dataset') {
-    vectors <- merge(vectors$files, vectors$vectors)
-  }
-
-  vectors$ospath <- as.character(vectors$ospath)
+  vectors$file <- as.character(vectors$file)
   commands <- list(...)
 
   dataset <- .Call('callLoadVectors', vectors, commands)

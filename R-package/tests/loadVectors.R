@@ -1,7 +1,6 @@
 library('omnetpp')
 dataset <- loadDataset(system.file('extdata/PureAloha1-0.vec', package='omnetpp'),
              add('vector', select='name("channel utilization")'))
-vectors <- merge(dataset$files, dataset$vectors)[,c('ospath', 'vectorid')]
 
 ops <- list(compare(0,1,-1,2),
             crop(0, 1),
@@ -27,6 +26,6 @@ ops <- list(compare(0,1,-1,2),
             winavg(10))            
 
 for (op in ops) {
-  print(loadVectors(vectors, apply(op)))
-  print(loadVectors(vectors, compute(op)))
+  print(loadVectors(dataset$vectors, apply(op)))
+  print(loadVectors(dataset$vectors, compute(op)))
 }
