@@ -7,11 +7,10 @@ vectorFiles <- c(system.file('extdata', 'OneFifo-0.vec', package='omnetpp'),
 #
 # Scatter chart from OMNeT++ samples/resultfiles/PureAlohaExperiment.anf 
 #
-# TODO iso lines not yet implemented
 dataset <- loadDataset(scalarFiles,
              add(type='scalar', select='module(Aloha.server) AND name("channel utilization")'),
              add(type='scalar', select='name(mean)'))
-xydata <- createScatterChartDataset(dataset, xModule='.', xName='mean', averageReplications=TRUE)
+xydata <- createScatterChartDataset(dataset, xModule='.', xName='mean', isoAttrs='numHosts', averageReplications=TRUE)
 plotLineChart(xydata, list(X.Axis.Title='Mean packet interarrival time', Y.Axis.Title='Utilization'))
 
 

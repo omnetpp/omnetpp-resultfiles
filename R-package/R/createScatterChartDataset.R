@@ -25,21 +25,62 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-createScatterChartDataset <- function (dataset, xModule, xName, isoModule, isoName, averageReplications=FALSE) {
-  # input:  scalars, xdata, iso params, average-replications
-  # output: list of two column matrices (x,y), elements named by series key
-  xScalarIndeces <- which(dataset$scalars$module == xModule & dataset$scalars$name == xName)
-  xScalars <- dataset$scalars[xScalarIndeces,]
-  otherScalars <- dataset$scalars[-xScalarIndeces,]
-  data <- merge(xScalars, otherScalars, by='runid')
+# input:  scalars, xdata, iso params, average-replications
+# output: list of two column matrices (x,y), elements named by series key
+createScatterChartDataset <- function (dataset, xModule, xName, isoModules=character(0), isoNames=character(0), isoAttrs=character(0), averageReplications=FALSE) {
 
-  lines <- split(data,list(data$module.y,data$name.y))
-  lines <- lapply(lines,
-          function(line) {
-              m <- as.matrix(line[c('value.x','value.y')])
-              colnames(m) <- c('x','y')
-              m[order(m[,1]),]
-          })
-  lines <- lines[sapply(lines,length) > 0]
-  lines
+  # group scalars according to iso scalars/attributes
+  groupScalars <- function(scalars) {
+    # remove iso scalars
+    i1 <- match(scalars$module, isoModules, nomatch=0)
+    i2 <- match(scalars$name, isoNames, nomatch=-1)
+    isoScalarIndeces <- which(i1 == i2)
+    isoScalars <- scalars[isoScalarIndeces,]
+    otherScalars <- if(length(isoScalarIndeces)>0) scalars[-isoScalarIndeces,] else scalars 
+    
+    # join run attributes and iso scalars
+    # TODO iso scalars
+    scalarsWithRuns <- merge(omnetpp:::getRunsInWideFormat(dataset$runattrs), otherScalars, by='runid')
+    
+    # split according to the values of the iso attributes
+    s <- if (length(isoAttrs)>0)
+           split(scalarsWithRuns, scalarsWithRuns[[isoAttrs]])
+         else
+           list(scalarsWithRuns)
+    
+    if (averageReplications) {
+      lapply(s,
+             function(data) {
+               s <- aggregate(data[,'value'], data[,c('experiment','measurement','module','name')], mean)
+               # rename column 'x' to 'value'
+               names(s)[names(s)=='x'] <- 'value'
+               s
+             })
+    }
+    else {
+      lapply(s, subset, select=c('runid', 'module', 'name', 'value'))
+    }
+  }
+
+  # sort one group of scalars
+  sortScalars <- function(scalars) {
+      xScalarIndeces <- which(scalars$module == xModule & scalars$name == xName)
+      xScalars <- scalars[xScalarIndeces,]
+      otherScalars <- scalars[-xScalarIndeces,]
+      byColumns <- if(averageReplications) c('experiment', 'measurement') else 'runid'
+      data <- merge(xScalars, otherScalars, by=byColumns)
+      lines <- split(data,list(data$module.y,data$name.y))
+      lines <- lapply(lines,
+              function(line) {
+                  m <- as.matrix(line[c('value.x','value.y')])
+                  colnames(m) <- c('x','y')
+                  m[order(m[,1]),]
+              })
+      lines <- lines[sapply(lines,length) > 0]
+      lines
+  }
+  
+  # TODO line names
+  #   '<module> <name> - <isoModule> <isoName>=<value> <isoAttr>=<value>'
+  do.call(c, lapply(groupScalars(dataset$scalars), sortScalars))
 }

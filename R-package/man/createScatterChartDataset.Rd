@@ -32,14 +32,15 @@
   Arranges scalars into an XY grid and optionally averages scalars from different
   replications of the same measurement.
 }
-\usage{createScatterChartDataset(dataset, xModule, xName, isoModule, isoName,
-                                 averageReplications=FALSE)}
+\usage{createScatterChartDataset(dataset, xModule, xName, isoModules, isoNames,
+                                 isoAttrs, averageReplications=FALSE)}
 \arguments{
     \item{dataset}{Object of class "dataset", holding the scalars and runs.}
     \item{xModule}{module name of the scalar on the X axis}
     \item{xName}{name of the scalar on the X axis}
-    \item{isoModule}{module name of the scalars of the iso lines}
-    \item{isoName}{name of the scalars of the iso lines}
+    \item{isoModules}{module names of the scalars of the iso lines}
+    \item{isoNames}{names of the scalars of the iso lines}
+    \item{isoAttrs}{names of iso run attributes}
     \item{averageReplications}{if TRUE then scalars from runs of the same measurement are averaged.}
 }
 
@@ -50,8 +51,8 @@
 
 \examples{
 d <- loadDataset('Aloha.sca', add(type='scalar'))
-createScatterChartDataset(d, xModule='.', xName='iaTime', isoModule='.',
-                          isoName='numHosts', averageReplications=TRUE)
+createScatterChartDataset(d, xModule='.', xName='iaTime', isoModules='.',
+                          isoNames='numHosts', averageReplications=TRUE)
 }
 
 \keyword{manip}
