@@ -56,16 +56,16 @@
 
 \value{
   an object of class '"omnetpp_dataset"' which is a list with 9 components:
-  \item{runs}{dataframe of runs with (run_key, runid, experiment, measurement, replication) columns}
-  \item{fileruns}{dataframe of run/file pairs (file_key, file) columns}
-  \item{scalars}{dataframe of scalars with (scalar_key, run_key, file, module, name, value) columns}
-  \item{vectors}{dataframe of vectors with (vector_key, run_key, file, vectorid, module, name) columns}
-  \item{histograms}{dataframe of histograms with (histogram_key, run_key, file, module, name) columns}
+  \item{runs}{dataframe of run attributes with (runid, name, value) columns}
+  \item{fileruns}{dataframe of run/file pairs (runid, file) columns}
+  \item{scalars}{dataframe of scalars with (scalar_key, runid, file, module, name, value) columns}
+  \item{vectors}{dataframe of vectors with (vector_key, runid, file, vectorid, module, name) columns}
+  \item{histograms}{dataframe of histograms with (histogram_key, runid, file, module, name) columns}
   \item{fields}{dataframe of histogram fields with (histogram_key, name, value) columns (names are 'count', 'min', 'max', 'mean', 'variance', 'stddev', \ldots)}
   \item{bins}{bounds and counts of bins of histograms, a dataframe with (histogram_key, lowerbound, upperbound, count) columns}
-  \item{params}{dataframe of module parameters in each run as a table with (run_key, name, value) columns}
-  \item{attributes}{dataframe of attributes of runs, scalars, vectors and histograms as a data.frame with (type, key, name, value) columns}
-
+  \item{params}{dataframe of module parameters in each run as a table with (runid, name, value) columns}
+  \item{attributes}{dataframe of attributes of scalars, vectors and histograms as a data.frame with (type, key, name, value) columns}
+  
   The key columns represent the links between the objects.
 }
 

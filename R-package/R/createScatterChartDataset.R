@@ -31,7 +31,7 @@ createScatterChartDataset <- function (dataset, xModule, xName, isoModule, isoNa
   xScalarIndeces <- which(dataset$scalars$module == xModule & dataset$scalars$name == xName)
   xScalars <- dataset$scalars[xScalarIndeces,]
   otherScalars <- dataset$scalars[-xScalarIndeces,]
-  data <- merge(xScalars, otherScalars, by='run_key')
+  data <- merge(xScalars, otherScalars, by='runid')
 
   lines <- split(data,list(data$module.y,data$name.y))
   lines <- lapply(lines,
