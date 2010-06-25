@@ -1,4 +1,4 @@
-library('omnetpp')
+require(omnetpp)
 dataset <- loadDataset(file.path(system.file('extdata', package='omnetpp'),'PureAlohaExperiment-4*.sca'),
                        add('scalar', 'module("Aloha.server")'))
 d <- createBarChartDataset(dataset, rows=c('measurement'), columns=c('name'))

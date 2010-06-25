@@ -1,4 +1,4 @@
-library('omnetpp')
+require(omnetpp)
 dataset <- loadDataset(system.file('extdata/PureAloha1-0.vec', package='omnetpp'),
              add('vector', select='name("channel utilization")'))
 
