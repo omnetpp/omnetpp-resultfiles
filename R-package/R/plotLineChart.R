@@ -25,40 +25,6 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-plotEmptyLineChart <- function(xlim, ylim, frame.plot=TRUE, ylog=FALSE, grid='None') {
-    plot.new()
-    plot.window(xlim, ylim, log=(if (ylog) 'y' else ''))
-    Axis(side=1)
-    Axis(side=2)
-    if (frame.plot)
-        box()
-
-    switch(grid,
-      None=NULL,
-      Minor=grid(),
-      Major=grid(),
-      stop("Unsupported Axes.Grid: ", grid)
-    )
-}
-
-plotLineChartLegend <- function(items, pch=15, col, lty='blank', position, anchoring) {
-    if (position != 'Inside') {
-        warning("Legend.Position not supported: ", position)
-    }
-    pos <- switch(anchoring,
-              North = 'top',
-              NorthEast = 'topright',
-              East = 'right',
-              SouthEast = 'bottomright',
-              South = 'bottom',
-              SouthWest = 'bottomleft',
-              West = 'left',
-              NorthWest = 'topleft',
-              stop("Legend.Anchoring not supported", anchoring)
-           )
-    legend(pos, items, pch=pch, col=col, lty=lty)
-}
-
 plotLineChart <- function (data, properties) {
 
     getProperty <- function(propertyName, defaultValue=NULL) {
@@ -102,40 +68,53 @@ plotLineChart <- function (data, properties) {
     xlim <- range(xy$x, finite=TRUE)
     ylim <- range(xy$y, finite=TRUE)
 
-    main   <- getProperty('Graph.Title', '')
-    xlab   <- getProperty('X.Axis.Title')
-    ylab   <- getProperty('Y.Axis.Title')
-    ylog   <- getProperty('Y.Axis.Log', 'false') == 'true'
-    grid   <- getProperty('Axes.Grid', 'None')
-
-    displayLegend   <- getProperty('Legend.Display', 'false') == 'true'
-
     # filter out invisible lines
     visible <- sapply(names(data), function(lineName) {getLineProperty('Line.Display', lineName, 'true') == 'true'})
     data <- data[visible]
-
     lineNames   <- names(data)
+
+    # plot empty graph (title and axes)
+    ylog   <- getProperty('Y.Axis.Log', 'false') == 'true'
+    plot.new()
+    plot.window(xlim, ylim, log=(if (ylog) 'y' else ''))
+    Axis(side=1)
+    Axis(side=2)
+    box()
+
+    grid   <- getProperty('Axes.Grid', 'None')
+    switch(grid,
+      None=NULL,
+      Minor=grid(),
+      Major=grid(),
+      stop("Unsupported Axes.Grid: ", grid)
+    )
+
+    # plot lines
     lineTypes   <- sapply(lineNames, getLineType)
     lineSymbols <- sapply(lineNames, getSymbolType)
     defaultColors <- rainbow(length(data))
     lineColors <- mapply(function(name, index) getLineProperty('Line.Color', name, defaultColors[[index]]),
                          lineNames, seq_along(lineNames))
-
-    # plot empty graph (title and axes)
-    plotEmptyLineChart(xlim, ylim)
-
-    # plot lines
     for (i in seq_along(data)) {
       lines(data[[i]]$x, data[[i]]$y, type=lineTypes[i], col=lineColors[i], pch=lineSymbols[i])
     }
 
-    title(main=main, xlab=xlab, ylab=ylab)
+    # title
+    title(main=getProperty('Graph.Title', ''),
+          xlab=getProperty('X.Axis.Title'),
+          ylab=getProperty('Y.Axis.Title'))
 
-    if (displayLegend) {
+    # legend
+    if (getProperty('Legend.Display', 'false') == 'true') {
       legendPosition  <- getProperty('Legend.Position', properties, 'Inside')
       legendAnchoring <- getProperty('Legend.Anchoring', properties, 'North')
-      plotLineChartLegend(lineNames, pch=lineSymbols, col=lineColors, lty='solid', position=legendPosition, anchoring=legendAnchoring)
+
+      if (legendPosition != 'Inside')
+          warning("Legend.Position not supported: ", legendPosition)
+      pos <- legendAnchoringToPosition(anchoring)
+      legend(pos, lineNames, pch=lineSymbols, col=lineColors, lty='solid')
     }
 
     invisible()
 }
+

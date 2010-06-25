@@ -39,7 +39,7 @@ plotBarChart <- function (data, properties) {
 
     data <- t(data)
 
-    # layout
+    # layout, calculate positions of bars
     cGroups <- ncol(data) # number of groups
     cBars <- nrow(data)   # number of bars in each group
     groupIndex <- col(data) - 1
