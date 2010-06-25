@@ -33,7 +33,7 @@
 }
 \usage{createHistograms(dataset)}
 \arguments{
-    \item{dataset}{an object of class "dataset" with 'histograms', 'fields' and 'bins' components.}
+    \item{dataset}{an object of class "dataset" with 'statistics', 'fields' and 'bins' components.}
 }
 
 \details{
@@ -59,7 +59,7 @@
 \seealso{\code{\link{loadDataset}}, \code{\link{hist}}}
 
 \examples{
-data <- loadDataset('queue.sca', add('histogram'))
+data <- loadDataset('queue.sca', add('statistic'))
 hists <- createHistograms(data)
 }
 

@@ -18,7 +18,7 @@ plotLineChart(xydata, list(X.Axis.Title='Mean packet interarrival time', Y.Axis.
 # Histogram from OMNeT++ samples/resultfiles/PureAlohaExperiment.anf 
 #
 dataset <- loadDataset(file.path(system.file('extdata', package='omnetpp'), 'PureAlohaExperiment-*.sca'),
-             add('histogram', 'module(Aloha.server) AND name("collision multiplicity") AND run(PureAlohaExperiment-1-*)'))
+             add('statistic', 'module(Aloha.server) AND name("collision multiplicity") AND run(PureAlohaExperiment-1-*)'))
 histograms <- createHistograms(dataset)
 plotHistogramChart(histograms, list(X.Axis.Title='number of colliding packets', Y.Axis.Title='number of times occured'))
 

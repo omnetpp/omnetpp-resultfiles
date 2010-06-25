@@ -47,7 +47,7 @@
 
   where
   \describe{
-  	\item{type:}{the type of the result item, one of 'scalar', 'vector' or 'histogram'}
+  	\item{type:}{the type of the result item, one of 'scalar', 'vector' or 'statistics'}
   	\item{select:}{a character value containing a pattern to match. See help for \link{patterns} for the description of the pattern language.}
   }
   
@@ -60,13 +60,13 @@
   \item{fileruns}{dataframe of run/file pairs (runid, file) columns}
   \item{scalars}{dataframe of scalars with (resultkey, runid, file, module, name, value) columns}
   \item{vectors}{dataframe of vectors with (resultkey, runid, file, vectorid, module, name) columns}
-  \item{histograms}{dataframe of histograms with (resultkey, runid, file, module, name) columns}
-  \item{fields}{dataframe of histogram fields with (resultkey, name, value) columns (names are 'count', 'min', 'max', 'mean', 'variance', 'stddev', \ldots)}
-  \item{bins}{bounds and counts of bins of histograms, a dataframe with (result, lowerbound, upperbound, count) columns}
+  \item{statistics}{dataframe of statistics with (resultkey, runid, file, module, name) columns}
+  \item{fields}{dataframe of statistic fields with (resultkey, name, value) columns (names are 'count', 'min', 'max', 'mean', 'variance', 'stddev', \ldots)}
+  \item{bins}{bounds and counts of bins of statistics, a dataframe with (result, lowerbound, upperbound, count) columns}
   \item{params}{dataframe of module parameters in each run as a table with (runid, name, value) columns}
-  \item{attrs}{dataframe of attributes of scalars, vectors and histograms as a data.frame with (type, resultkey, name, value) columns}
+  \item{attrs}{dataframe of attributes of scalars, vectors and statistics as a data.frame with (type, resultkey, name, value) columns}
   
-  Scalars, vectors and histograms have a 'resultkey' identifier, that is used to reference the result items from other data frames.
+  Scalars, vectors and statistics have a 'resultkey' identifier, that is used to reference the result items from other data frames.
 }
 
 \seealso{\link{patterns}, \link{filters}}

@@ -47,7 +47,7 @@ loadDataset <- function(files, ...) {
       fileruns = as.data.frame(dataset$fileruns),
       scalars = as.data.frame(dataset$scalars),
       vectors = as.data.frame(dataset$vectors),
-      histograms = as.data.frame(dataset$histograms),
+      statistics = as.data.frame(dataset$statistics),
       fields = as.data.frame(dataset$fields),
       bins = as.data.frame(dataset$bins),
       params = as.data.frame(dataset$params),

@@ -100,7 +100,9 @@ Loaded PureAlohaExperiment-1.sca
 Loaded PureAlohaExperiment-2.sca
 \end{verbatim}
 
-Why does loadDataset() look so complicated?  TODO because it does much more: one can have more than one add(), and also discard(); within an add() one can filter by result type (scalar, vector, histogram), by result item name, etc.
+Why does loadDataset() look so complicated?  TODO because it does much more:
+one can have more than one add(), and also discard(); within an add() one can
+filter by result type (scalar, vector, statistic), by result item name, etc.
 
 You can print the contents of the data frame by simply typing the name of the variable:
 
@@ -114,7 +116,7 @@ The output is quite long. However, you can notice that the data frame contains s
 
 \begin{verbatim}
 > names(x)
-[1] "runs"       "files"      "scalars"    "vectors"    "histograms"
+[1] "runs"       "files"      "scalars"    "vectors"    "statistics"
 [6] "fields"     "bins"       "params"     "attributes"
 \end{verbatim}
 
@@ -158,11 +160,11 @@ following command:
 \end{verbatim}
 
 We won't need all components in the data frame (for example, we don't have vectors 
-and histograms in the loaded scalar files), so we can remove some of them:
+and statistics in the loaded scalar files), so we can remove some of them:
  
 \begin{verbatim}
 > x$vectors <- NULL
-> x$histograms <- NULL
+> x$statistics <- NULL
 > x$fields <- NULL
 > x$bins <- NULL
 > x$params <- NULL

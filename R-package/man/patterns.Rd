@@ -38,7 +38,7 @@
   pattern as a filter expression. It must be quoted if it contains whitespace or parentheses.
 
   \tabular{ll}{
-    name \tab the name of the scalar, vector or histogram \cr
+    name \tab the name of the scalar, vector or statistic \cr
     module \tab the name of the module \cr
     file \tab the file of the result item \cr
     run \tab the run identifier \cr

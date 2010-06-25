@@ -52,7 +52,7 @@ static int checkType(SEXP type)
         return ResultFileManager::SCALAR;
     else if (strcmp(typeStr, "vector") == 0)
         return ResultFileManager::VECTOR;
-    else if (strcmp(typeStr, "histogram") == 0)
+    else if (strcmp(typeStr, "statistic") == 0)
         return ResultFileManager::HISTOGRAM;
     else
         throw opp_runtime_error("unknown type: %s", typeStr);
@@ -88,8 +88,8 @@ static IDList selectIDs(int type, const char *pattern, const ResultFileManager &
     }
     if ((type & ResultFileManager::HISTOGRAM) != 0)
     {
-        IDList histograms = manager.getAllHistograms();
-        source.merge(histograms);
+        IDList statistics = manager.getAllHistograms();
+        source.merge(statistics);
     }
     IDList idlist = manager.filterIDList(source, pattern);
 
@@ -112,8 +112,8 @@ static void executeCommands(SEXP files, SEXP commands, ResultFileManager &manage
         out.merge(scalars);
         IDList vectors = manager.getAllVectors();
         out.merge(vectors);
-        IDList histograms = manager.getAllHistograms();
-        out.merge(histograms);
+        IDList statistics = manager.getAllHistograms();
+        out.merge(statistics);
     }
     else
     {
@@ -194,7 +194,7 @@ static IDList filterIDListByType(const IDList &idlist, int type, const ResultFil
     return result;
 }
 
-static const char* datasetColumnNames[] = {"runattrs", "fileruns", "scalars", "vectors", "histograms", "fields", "bins", "params", "attrs"};
+static const char* datasetColumnNames[] = {"runattrs", "fileruns", "scalars", "vectors", "statistics", "fields", "bins", "params", "attrs"};
 static const int datasetColumnsLength = sizeof(datasetColumnNames) / sizeof(const char*);
 
 const char* runColumnNames[] = {"runid", "name", "value"};
@@ -213,9 +213,9 @@ const char* vectorColumnNames[] = {"resultkey", "runid", "file", "vectorid", "mo
 const SEXPTYPE vectorColumnTypes[] = {INTSXP, STRSXP, STRSXP, INTSXP, STRSXP, STRSXP};
 const int vectorColumnsLength = sizeof(vectorColumnNames) / sizeof(const char*);
 
-const char* histogramColumnNames[] = {"resultkey", "runid", "file", "module", "name"};
-const SEXPTYPE histogramColumnTypes[] = {INTSXP, STRSXP, STRSXP, STRSXP, STRSXP};
-const int histogramColumnsLength = sizeof(histogramColumnNames) / sizeof(const char*);
+const char* statisticColumnNames[] = {"resultkey", "runid", "file", "module", "name"};
+const SEXPTYPE statisticColumnTypes[] = {INTSXP, STRSXP, STRSXP, STRSXP, STRSXP};
+const int statisticColumnsLength = sizeof(statisticColumnNames) / sizeof(const char*);
 
 const char* fieldColumnNames[] = {"resultkey", "name", "value"};
 const SEXPTYPE fieldColumnTypes[] = {INTSXP, STRSXP, REALSXP};
@@ -341,32 +341,32 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
         SET_STRING_ELT(name, i, mkChar(vector.nameRef->c_str()));
     }
 
-    // histograms
-    IDList histogramIDs = filterIDListByType(idlist, ResultFileManager::HISTOGRAM, manager);
-    int histogramCount = histogramIDs.size();
-    int histogramKeyStart = vectorKeyStart + vectorCount;
-    SEXP histograms = createDataFrame(histogramColumnNames, histogramColumnTypes, histogramColumnsLength, histogramCount);
-    resultKey = VECTOR_ELT(histograms, 0);
-    runid = VECTOR_ELT(histograms, 1);
-    file = VECTOR_ELT(histograms, 2);
-    module = VECTOR_ELT(histograms, 3);
-    name = VECTOR_ELT(histograms, 4);
-    SET_ELEMENT(dataset, 4, histograms);
-    UNPROTECT(1); // histograms
+    // statistics
+    IDList statisticIDs = filterIDListByType(idlist, ResultFileManager::HISTOGRAM, manager);
+    int statisticCount = statisticIDs.size();
+    int statisticKeyStart = vectorKeyStart + vectorCount;
+    SEXP statistics = createDataFrame(statisticColumnNames, statisticColumnTypes, statisticColumnsLength, statisticCount);
+    resultKey = VECTOR_ELT(statistics, 0);
+    runid = VECTOR_ELT(statistics, 1);
+    file = VECTOR_ELT(statistics, 2);
+    module = VECTOR_ELT(statistics, 3);
+    name = VECTOR_ELT(statistics, 4);
+    SET_ELEMENT(dataset, 4, statistics);
+    UNPROTECT(1); // statistics
     int binCount = 0, fieldCount = 0;
-    for (int i = 0; i < histogramCount; ++i)
+    for (int i = 0; i < statisticCount; ++i)
     {
-        ID id = histogramIDs.get(i);
-        const HistogramResult &histogram = manager.getHistogram(id);
-        binCount += histogram.bins.size();
-        fieldCount += histogram.fields.size();
-        attrCount += histogram.attributes.size();
+        ID id = statisticIDs.get(i);
+        const HistogramResult &statistic = manager.getHistogram(id);
+        binCount += statistic.bins.size();
+        fieldCount += statistic.fields.size();
+        attrCount += statistic.attributes.size();
 
-        INTEGER(resultKey)[i] = histogramKeyStart + i;
-        SET_STRING_ELT(runid, i, mkChar(histogram.fileRunRef->runRef->runName.c_str()));
-        SET_STRING_ELT(file, i, mkChar(histogram.fileRunRef->fileRef->fileSystemFilePath.c_str()));
-        SET_STRING_ELT(module, i, mkChar(histogram.moduleNameRef->c_str()));
-        SET_STRING_ELT(name, i, mkChar(histogram.nameRef->c_str()));
+        INTEGER(resultKey)[i] = statisticKeyStart + i;
+        SET_STRING_ELT(runid, i, mkChar(statistic.fileRunRef->runRef->runName.c_str()));
+        SET_STRING_ELT(file, i, mkChar(statistic.fileRunRef->fileRef->fileSystemFilePath.c_str()));
+        SET_STRING_ELT(module, i, mkChar(statistic.moduleNameRef->c_str()));
+        SET_STRING_ELT(name, i, mkChar(statistic.nameRef->c_str()));
     }
 
     // fields
@@ -377,15 +377,15 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
     SET_ELEMENT(dataset, 5, fields);
     UNPROTECT(1); // fields
     index = 0;
-    for (int i = 0; i < histogramCount; ++i)
+    for (int i = 0; i < statisticCount; ++i)
     {
-        ID id = histogramIDs.get(i);
-        const HistogramResult &histogram = manager.getHistogram(id);
-        const HistogramFields &fields = histogram.fields;
+        ID id = statisticIDs.get(i);
+        const HistogramResult &statistic = manager.getHistogram(id);
+        const HistogramFields &fields = statistic.fields;
 
         for(HistogramFields::const_iterator it = fields.begin(); it != fields.end(); ++it)
         {
-            INTEGER(resultKey)[index] = histogramKeyStart + i;
+            INTEGER(resultKey)[index] = statisticKeyStart + i;
             SET_STRING_ELT(name, index, mkChar(it->first.c_str()));
             REAL(value)[index] = it->second;
             index++;
@@ -399,17 +399,17 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
     SET_ELEMENT(dataset, 6, bins);
     UNPROTECT(1); // bins
     index = 0;
-    for (int i = 0; i < histogramCount; ++i)
+    for (int i = 0; i < statisticCount; ++i)
     {
-        ID id = histogramIDs.get(i);
-        const HistogramResult &histogram = manager.getHistogram(id);
-        int size = histogram.bins.size();
+        ID id = statisticIDs.get(i);
+        const HistogramResult &statistic = manager.getHistogram(id);
+        int size = statistic.bins.size();
         for (int j = 0; j < size; ++j)
         {
-            INTEGER(resultKey)[index] = histogramKeyStart + i;
-            REAL(lowerbound)[index] = histogram.bins[j];
-            REAL(upperbound)[index] = j+1 < size ? histogram.bins[j+1] : R_PosInf;
-            REAL(count)[index] = histogram.values[j];
+            INTEGER(resultKey)[index] = statisticKeyStart + i;
+            REAL(lowerbound)[index] = statistic.bins[j];
+            REAL(upperbound)[index] = j+1 < size ? statistic.bins[j+1] : R_PosInf;
+            REAL(count)[index] = statistic.values[j];
             index++;
         }
     }
@@ -444,7 +444,7 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
     index = 0;
     addResultItemAttributes(attrs, index, "scalar", scalarIDs, scalarKeyStart, manager);
     addResultItemAttributes(attrs, index, "vector", vectorIDs, vectorKeyStart, manager);
-    addResultItemAttributes(attrs, index, "histogram", histogramIDs, histogramKeyStart, manager);
+    addResultItemAttributes(attrs, index, "statistic", statisticIDs, statisticKeyStart, manager);
 
     UNPROTECT(1); // dataset
 

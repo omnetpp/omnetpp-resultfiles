@@ -15,11 +15,11 @@ dataset <- loadDataset(scalarFiles)
 dataset <- loadDataset(scalarFiles, add(type='scalar'))
 
 #
-# Load everything except histograms.
+# Load everything except statistics.
 #
 dataset <- loadDataset(scalarFiles,
                        add(select='*'),
-                       discard(type='histogram'))
+                       discard(type='statistic'))
 
 #
 # Load selected scalars.

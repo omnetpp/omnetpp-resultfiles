@@ -65,7 +65,10 @@ createHistograms <- function (dataset) {
 
   }
 
-  data <- merge(getRunsInWideFormat(dataset$runattrs), dataset$histograms, by='runid')
+  data <- merge(getRunsInWideFormat(dataset$runattrs),
+                subset(dataset$statistics, resultkey %in% dataset$bins$resultkey),
+                by='runid')
+  
   histogramNames <- getResultItemNames(data)
   hs <- lapply(seq_along(histogramNames),
                function (i) {
