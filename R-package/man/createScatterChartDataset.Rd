@@ -49,7 +49,7 @@
 }
 
 \examples{
-d <- loadDataset(add(type='scalar', file='Aloha.sca'))
+d <- loadDataset('Aloha.sca', add(type='scalar'))
 createScatterChartDataset(d, xModule='.', xName='iaTime', isoModule='.',
                           isoName='numHosts', averageReplications=TRUE)
 }

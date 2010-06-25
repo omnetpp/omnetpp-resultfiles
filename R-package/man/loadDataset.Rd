@@ -32,25 +32,26 @@
   Loads data from result files.
 }
 
-\usage{loadDataset(\dots)}
+\usage{loadDataset(files, \dots)}
 \arguments{
-    \item{\dots}{The load operations describing the data to load. The arguments are not evaluated.}
+	\item{files}{Character vector containing the names of the files to be loaded. Wildcards are allowed in file names.}
+    \item{\dots}{The add/discard operations selecting the data to load.}
 }
 
 \details{
-  The arguments of the function is a list of processing steps, executed in order.
-  Each step must be one of the following:
+  The \dots argument is a sequence of add/discard forms:
   \tabular{ll}{
-    \code{add(type,files,select)} \tab Adds result items from files. \cr
+    \code{add(type,select)} \tab Adds the selected result items to the dataset. \cr
     \code{discard(type,select)}   \tab Removes the selected result items from the dataset. \cr
   }
 
   where
   \describe{
   	\item{type:}{the type of the result item, one of 'scalar', 'vector' or 'histogram'}
-  	\item{files:}{a character vector containing the names of the files to load. Wildcards are allowed in file names.}
   	\item{select:}{a character value containing a pattern to match. See help for \link{patterns} for the description of the pattern language.}
   }
+  
+  If no add/remove operations are given, all data is loaded from the specified files.
 }
 
 \value{
@@ -73,9 +74,9 @@
 \examples{
 # load scalars from Aloha-1.sca and Aloha-2.sca written by module 'Aloha.server'
 # and vectors from 'PureAloha1-*.vec' files except 'channel utilization'
-loadDataset(
-  add(type='scalar', files=c('Aloha-1.sca', 'Aloha-2.sca'), select='module(Aloha.server)'),
-  add('vector', 'PureAloha1-*.vec'),
+loadDataset(c('Aloha-1.sca', 'Aloha-2.sca', 'PureAloha1-*.vec'),
+  add(type='scalar', select='module(Aloha.server)'),
+  add('vector'),
   discard('vector', 'name("channel utilization")')
 )
 

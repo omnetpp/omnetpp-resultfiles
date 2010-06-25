@@ -25,23 +25,18 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-add <- function(type, files, select) {
-  call <- as.list(match.call())
-  if (!is.null(call$files)) {
-    call$files <- eval(call$files, parent.frame(n=2))
-    call$files <- unlist(sapply(call$files, Sys.glob), use.names=FALSE)
-  }
-
-  return (call)
+add <- function(type, select) {
+  as.list(match.call())
 }
 
 discard <- function(type, select) {
   as.list(match.call())
 }
 
-loadDataset <- function(...) {
+loadDataset <- function(files, ...) {
+  files <- unlist(sapply(files, Sys.glob), use.names=FALSE)
   commands <- list(...)
-  dataset <- .Call('callLoadDataset', commands)
+  dataset <- .Call('callLoadDataset', files, commands)
 
   if (is.null(dataset))
     return(dataset)
@@ -62,3 +57,4 @@ loadDataset <- function(...) {
     commands=commands
   )
 }
+

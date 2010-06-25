@@ -33,7 +33,7 @@
 
 extern "C" {
 
-SEXP callLoadDataset(SEXP commands);
+SEXP callLoadDataset(SEXP files, SEXP commands);
 
 }
 

@@ -94,7 +94,7 @@ but it can also be done from within R:
 Now we load the contents of the files into an R data frame.
 
 \begin{verbatim}
-> x <- loadDataset(add(files="*.sca"))
+> x <- loadDataset("*.sca")
 Loaded PureAlohaExperiment-0.sca
 Loaded PureAlohaExperiment-1.sca
 Loaded PureAlohaExperiment-2.sca
@@ -383,7 +383,7 @@ TODO
 Let us begin with loading a vector file:
 
 \begin{verbatim}
-> x <-loadDataset(add(files="OneFifo*.vec"))
+> x <-loadDataset("OneFifo*.vec")
 Loaded OneFifo-0.vec
 > x$vectors
    vector_key run_key file_key vectorid            module                          name

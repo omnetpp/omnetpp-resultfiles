@@ -7,30 +7,31 @@ vectorFiles <- c(system.file('extdata', 'OneFifo-0.vec', package='omnetpp'),
 #
 # Load everything from scalar files. 
 #
-dataset <- loadDataset(add(files=scalarFiles))
+dataset <- loadDataset(scalarFiles)
 
 #
 # Load scalars only.
 #
-dataset <- loadDataset(add(type='scalar', files=scalarFiles))
+dataset <- loadDataset(scalarFiles, add(type='scalar'))
 
 #
 # Load everything except histograms.
 #
-dataset <- loadDataset(add(files=scalarFiles),
+dataset <- loadDataset(scalarFiles,
+                       add(select='*'),
                        discard(type='histogram'))
 
 #
 # Load selected scalars.
 #
-dataset <- loadDataset(add(type='scalar',
-                           files=scalarFiles,
+dataset <- loadDataset(scalarFiles,
+                       add(type='scalar',
                            select='module(Aloha.server) AND name("channel utilization")'))
 
 #
 # Load result items from vector files.
 #
-dataset <- loadDataset(add(files=vectorFiles))
+dataset <- loadDataset(vectorFiles)
 
 #
 # Load data of all vectors.
@@ -41,12 +42,12 @@ print(data$vectors[,c('module','name')])
 #
 # Load queueing times from the TokenRing simulation and compute their winavg too.
 #
-dataset <- loadDataset(add(files=vectorFiles, select='module("TokenRing.comp[*].mac") AND name("Queueing time (sec)")'))
+dataset <- loadDataset(vectorFiles, add(select='module("TokenRing.comp[*].mac") AND name("Queueing time (sec)")'))
 data <- loadVectors(dataset, compute(winavg(windowSize=10)))
 print(data$vectors[,c('module','name')])
 
 #
 # See the structure of the OMNeT++ dataset.
 #
-dataset <- loadDataset(add(files=c(scalarFiles, vectorFiles)))
+dataset <- loadDataset(c(scalarFiles, vectorFiles))
 print(str(dataset))

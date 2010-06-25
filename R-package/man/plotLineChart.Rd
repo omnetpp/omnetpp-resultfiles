@@ -58,7 +58,7 @@
 }
 
 \examples{
-d <- loadDataset(add(type='vector', files=system.file('extdata/PureAloha1-0.vec', package='omnetpp')))
+d <- loadDataset(system.file('extdata/PureAloha1-0.vec', package='omnetpp'), add(type='vector'))
 vectors <- loadVectors(merge(d$files, d$vectors))
 plotLineChart(split(vectors$vectordata, vectors$vectordata$vector_key), list())
 }

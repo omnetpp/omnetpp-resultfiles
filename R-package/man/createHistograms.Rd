@@ -59,7 +59,7 @@
 \seealso{\code{\link{loadDataset}}, \code{\link{hist}}}
 
 \examples{
-data <- loadDataset(add(type='histogram', files='queue.sca'))
+data <- loadDataset('queue.sca', add('histogram'))
 hists <- createHistograms(data)
 }
 

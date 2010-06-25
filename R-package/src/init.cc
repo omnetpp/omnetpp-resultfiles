@@ -42,7 +42,7 @@ R_CMethodDef cMethods[] = {
 */
 
 R_CallMethodDef callMethods[] = {
-        {"callLoadDataset", (DL_FUNC)&callLoadDataset, 1},
+        {"callLoadDataset", (DL_FUNC)&callLoadDataset, 2},
         {"callLoadVectors", (DL_FUNC)&callLoadVectors, 2},
         {NULL, NULL, 0}
 };

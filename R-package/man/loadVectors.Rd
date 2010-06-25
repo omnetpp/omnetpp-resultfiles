@@ -93,9 +93,9 @@
 \seealso{\link{patterns}, \link{filters}}
 
 \examples{
-d <- loadDataset(
-       add(type='scalar', files='Aloha.sca', select='module(Aloha.server)'),
-       add('vector', 'PureAloha1-*.vec'))
+d <- loadDataset(c('Aloha.sca', 'PureAloha1-*.vec'),
+       add(type='scalar', select='module(Aloha.server)'),
+       add('vector'))
 
 vectorids = merge(d$files, d$vectors)[,c('ospath','vectorid')]
 

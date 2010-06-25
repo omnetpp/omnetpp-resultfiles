@@ -71,81 +71,87 @@ static ResultFileList loadFiles(SEXP files, ResultFileManager &manager)
     return fileList;
 }
 
-static IDList selectIDs(const ResultFileList *files, int type, const char *pattern, const ResultFileManager &manager)
+static IDList selectIDs(int type, const char *pattern, const ResultFileManager &manager)
 {
-    FileRunList fileRuns = manager.getFileRuns(files, NULL);
-
     IDList source;
-    for (FileRunList::iterator it = fileRuns.begin(); it != fileRuns.end(); ++it)
+    if ((type & ResultFileManager::SCALAR) != 0)
     {
-        FileRun *fileRun = *it;
-        if ((type & ResultFileManager::SCALAR) != 0)
-        {
-            IDList scalars = manager.getScalarsInFileRun(fileRun);
-            source.merge(scalars);
-        }
-        if ((type & ResultFileManager::VECTOR) != 0)
-        {
-            IDList vectors = manager.getVectorsInFileRun(fileRun);
-            source.merge(vectors);
-        }
-        if ((type & ResultFileManager::HISTOGRAM) != 0)
-        {
-            IDList histograms = manager.getHistogramsInFileRun(fileRun);
-            source.merge(histograms);
-        }
+        IDList scalars = manager.getAllScalars(false, false);
+        source.merge(scalars);
+    }
+    if ((type & ResultFileManager::VECTOR) != 0)
+    {
+        IDList vectors = manager.getAllVectors();
+        source.merge(vectors);
+    }
+    if ((type & ResultFileManager::HISTOGRAM) != 0)
+    {
+        IDList histograms = manager.getAllHistograms();
+        source.merge(histograms);
     }
     IDList idlist = manager.filterIDList(source, pattern);
+
     return idlist;
 }
 
-static void executeCommands(SEXP commands, ResultFileManager &manager, IDList &out)
+static void executeCommands(SEXP files, SEXP commands, ResultFileManager &manager, IDList &out)
 {
+    ResultFileList fileList = loadFiles(files, manager);
+
     if (!IS_VECTOR(commands))
     {
         throw opp_runtime_error("commands is not a list");
     }
 
     int numOfCommands = GET_LENGTH(commands);
-    for (int i = 0; i < numOfCommands; ++i)
+    if (numOfCommands == 0)
     {
-        SEXP command = VECTOR_ELT(commands, i);
-
-        if (!IS_LIST(command))
-            throw opp_runtime_error("command is not a list");
-        if (GET_LENGTH(command) == 0)
-            throw opp_runtime_error("command is empty list");
-
-        SEXP op = VECTOR_ELT(command, 0);
-        if (!isSymbol(op))
-            throw opp_runtime_error("operator is not a symbol: %d", (int)TYPEOF(op));
-        const char *opname = CHAR(PRINTNAME(op));
-
-        int type = checkType(getElementByName(command, "type"));
-
-        SEXP select = getElementByName(command, "select");
-        const char *selectStr = NULL;
-        if (IS_CHARACTER(select) && GET_LENGTH(select) > 0)
-            selectStr = CHAR(STRING_ELT(select, 0));
-        else if (select != R_NilValue)
-            throw opp_runtime_error("select is not a string");
-
-
-        if (strcmp(opname, "add") == 0)
+        IDList scalars = manager.getAllScalars(false, false);
+        out.merge(scalars);
+        IDList vectors = manager.getAllVectors();
+        out.merge(vectors);
+        IDList histograms = manager.getAllHistograms();
+        out.merge(histograms);
+    }
+    else
+    {
+        for (int i = 0; i < numOfCommands; ++i)
         {
-            SEXP files = getElementByName(command, "files");
-            ResultFileList fileList = loadFiles(files, manager);
-            IDList selectedIDs = selectIDs(&fileList, type, selectStr, manager);
-            out.merge(selectedIDs);
-        }
-        else if (strcmp(opname, "discard") == 0)
-        {
-            IDList selectedIDs = selectIDs(NULL, type, selectStr, manager);
-            out.substract(selectedIDs);
-        }
-        else
-        {
-            throw opp_runtime_error("unknown command: %s", opname);
+            SEXP command = VECTOR_ELT(commands, i);
+
+            if (!IS_LIST(command))
+                throw opp_runtime_error("command is not a list");
+            if (GET_LENGTH(command) == 0)
+                throw opp_runtime_error("command is empty list");
+
+            SEXP op = VECTOR_ELT(command, 0);
+            if (!isSymbol(op))
+                throw opp_runtime_error("operator is not a symbol: %d", (int)TYPEOF(op));
+            const char *opname = CHAR(PRINTNAME(op));
+
+            int type = checkType(getElementByName(command, "type"));
+
+            SEXP select = getElementByName(command, "select");
+            const char *selectStr = NULL;
+            if (IS_CHARACTER(select) && GET_LENGTH(select) > 0)
+                selectStr = CHAR(STRING_ELT(select, 0));
+            else if (select != R_NilValue)
+                throw opp_runtime_error("select is not a string");
+
+            if (strcmp(opname, "add") == 0)
+            {
+                IDList selectedIDs = selectIDs(type, selectStr, manager);
+                out.merge(selectedIDs);
+            }
+            else if (strcmp(opname, "discard") == 0)
+            {
+                IDList selectedIDs = selectIDs(type, selectStr, manager);
+                out.substract(selectedIDs);
+            }
+            else
+            {
+                throw opp_runtime_error("unknown command: %s", opname);
+            }
         }
     }
 }
@@ -245,6 +251,7 @@ const char* attributeColumnNames[] = {"type", "key", "name", "value"};
 const SEXPTYPE attributeColumnTypes[] = {STRSXP, INTSXP, STRSXP, STRSXP};
 const int attributeColumnsLength = sizeof(attributeColumnNames) / sizeof(const char*);
 
+// TODO filerun
 SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
 {
     int paramsCount = 0, attrCount = 0;
@@ -461,7 +468,7 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
     return dataset;
 }
 
-SEXP callLoadDataset(SEXP commands)
+SEXP callLoadDataset(SEXP files, SEXP commands)
 {
     try
     {
@@ -469,7 +476,7 @@ SEXP callLoadDataset(SEXP commands)
         IDList idlist;
         SEXP dataset;
 
-        executeCommands(commands, manager, idlist);
+        executeCommands(files, commands, manager, idlist);
         dataset = exportDataset(manager, idlist);
         return dataset;
     }
