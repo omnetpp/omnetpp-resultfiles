@@ -195,7 +195,7 @@ static const char* vectordataColumnNames[] = {"resultkey", "eventno", "x", "y"};
 static const SEXPTYPE vectordataColumnTypes[] = {INTSXP, INTSXP, REALSXP, REALSXP};
 static const int vectordataColumnsLength = sizeof(vectordataColumnNames) / sizeof(const char*);
 
-static const char* attributeColumnNames[] = {"resultkey", "name", "value"};
+static const char* attributeColumnNames[] = {"resultkey", "attrname", "attrvalue"};
 static const SEXPTYPE attributeColumnTypes[] = {INTSXP, STRSXP, STRSXP};
 static const int attributeColumnsLength = sizeof(attributeColumnNames) / sizeof(const char*);
 

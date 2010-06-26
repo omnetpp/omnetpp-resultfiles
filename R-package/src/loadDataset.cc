@@ -197,7 +197,7 @@ static IDList filterIDListByType(const IDList &idlist, int type, const ResultFil
 static const char* datasetColumnNames[] = {"runattrs", "fileruns", "scalars", "vectors", "statistics", "fields", "bins", "params", "attrs"};
 static const int datasetColumnsLength = sizeof(datasetColumnNames) / sizeof(const char*);
 
-const char* runColumnNames[] = {"runid", "name", "value"};
+const char* runColumnNames[] = {"runid", "attrname", "attrvalue"};
 const SEXPTYPE runColumnTypes[] = {STRSXP, STRSXP, STRSXP};
 const int runColumnsLength = sizeof(runColumnNames) / sizeof(const char*);
 
@@ -217,7 +217,7 @@ const char* statisticColumnNames[] = {"resultkey", "runid", "file", "module", "n
 const SEXPTYPE statisticColumnTypes[] = {INTSXP, STRSXP, STRSXP, STRSXP, STRSXP};
 const int statisticColumnsLength = sizeof(statisticColumnNames) / sizeof(const char*);
 
-const char* fieldColumnNames[] = {"resultkey", "name", "value"};
+const char* fieldColumnNames[] = {"resultkey", "fieldname", "fieldvalue"};
 const SEXPTYPE fieldColumnTypes[] = {INTSXP, STRSXP, REALSXP};
 const int fieldColumnsLength = sizeof(fieldColumnNames) / sizeof(const char*);
 
@@ -225,11 +225,11 @@ const char* binColumnNames[] = {"resultkey", "lowerbound", "upperbound", "count"
 const SEXPTYPE binColumnTypes[] = {INTSXP, REALSXP, REALSXP, REALSXP};
 const int binColumnsLength = sizeof(binColumnNames) / sizeof(const char*);
 
-const char* paramColumnNames[] = {"runid", "name", "value"};
+const char* paramColumnNames[] = {"runid", "paramname", "paramvalue"};
 const SEXPTYPE paramColumnTypes[] = {STRSXP, STRSXP, STRSXP};
 const int paramColumnsLength = sizeof(paramColumnNames) / sizeof(const char*);
 
-const char* attributeColumnNames[] = {"type", "resultkey", "name", "value"};
+const char* attributeColumnNames[] = {"attrtype", "resultkey", "attrname", "attrvalue"};
 const SEXPTYPE attributeColumnTypes[] = {STRSXP, INTSXP, STRSXP, STRSXP};
 const int attributeColumnsLength = sizeof(attributeColumnNames) / sizeof(const char*);
 

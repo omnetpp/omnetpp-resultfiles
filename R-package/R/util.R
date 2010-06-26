@@ -29,8 +29,8 @@ getRunsInWideFormat <- function (runattrs) {
    drop.levels <- function(dataframe) {
      dataframe[] <- lapply(dataframe, function(x) x[,drop=TRUE])
      return(dataframe)
-   } 
-  runattrs <- drop.levels(reshape(runattrs, direction='wide', idvar='runid', timevar='name'))
+   }
+  runattrs <- drop.levels(reshape(runattrs, direction='wide', idvar='runid', timevar='attrname'))
   names(runattrs) <- sapply(names(runattrs), function (name) sub("^value\\.", "", name) )
   runattrs
 }
@@ -58,7 +58,7 @@ formatResultItems <- function(data, formatString) {
       data[[fieldName]]
     )
   }
-  
+
   matches <- gregexpr("(?<!\\\\)\\{([a-zA-Z-]+)\\}", formatString, perl=TRUE)
   starts <- as.vector(matches[[1]])
   ends <- starts + attr(matches[[1]], "match.length") - 1
@@ -95,7 +95,7 @@ getDefaultNameFormat <- function(data) {
     any(values!=values[1])
   }
   fields <- Filter(hasDifferentValues, c("file", "run", "runnumber", "module", "name", "experiment", "measurement", "replication"))
-    
+
   if (length(fields) > 0)
     do.call(paste, as.list(paste("{", fields, "}", sep="")))
   else

@@ -83,10 +83,10 @@
 
 \value{
   a list with 3 components:
-  \item{vectors}{dataframe of vectors with (resultkey, ospath, vectorid, module, name) columns, ospath is '' for computed vectors}
+  \item{vectors}{dataframe of vectors with (resultkey, file, vectorid, module, name) columns, file is '' for computed vectors}
   \item{vectordata}{dataframe of vector data with (resultkey, eventno, x, y) columns}
-  \item{attrs}{dataframe of attributes of computed vectors with (resultkey, name, value) columns}
-  
+  \item{attrs}{dataframe of attributes of computed vectors with (resultkey, attrname, attrvalue) columns}
+
   The 'resultkey' columns represent the links between the objects.
 }
 
