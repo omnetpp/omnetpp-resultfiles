@@ -105,13 +105,13 @@ plotLineChart <- function (data, properties) {
           ylab=getProperty('Y.Axis.Title'))
 
     # legend
-    if (getProperty('Legend.Display', 'false') == 'true') {
-      legendPosition  <- getProperty('Legend.Position', properties, 'Inside')
-      legendAnchoring <- getProperty('Legend.Anchoring', properties, 'North')
+    if (getProperty('Legend.Display', 'true') == 'true') {
+      legendPosition  <- getProperty('Legend.Position', 'Inside')
+      legendAnchoring <- getProperty('Legend.Anchoring', 'North')
 
       if (legendPosition != 'Inside')
           warning("Legend.Position not supported: ", legendPosition)
-      pos <- legendAnchoringToPosition(anchoring)
+      pos <- legendAnchoringToPosition(legendAnchoring)
       legend(pos, lineNames, pch=lineSymbols, col=lineColors, lty='solid')
     }
 
