@@ -25,8 +25,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-#TODO: add a resultNameFormat parameter! --Andras
-createHistograms <- function (dataset) {
+createHistograms <- function (dataset, nameFormat) {
   makeHist <- function(key, name) {
       bins <- dataset$bins[dataset$bins$resultkey == key,]
       # remove under/overflow bins
@@ -70,7 +69,7 @@ createHistograms <- function (dataset) {
                 subset(dataset$statistics, resultkey %in% dataset$bins$resultkey),
                 by='runid')
   
-  histogramNames <- getResultItemNames(data)
+  histogramNames <- getResultItemNames(data, nameFormat)
   hs <- lapply(seq_along(histogramNames),
                function (i) {
                  name <- histogramNames[i]
