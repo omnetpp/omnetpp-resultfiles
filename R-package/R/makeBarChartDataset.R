@@ -25,7 +25,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-createBarChartDataset <- function (dataset, rows, columns, aggregate='mean') {
+makeBarChartDataset <- function (dataset, rows, columns, aggregate='mean') {
   runattrs <- getRunsInWideFormat(dataset$runattrs)
   scalars <- merge(runattrs, dataset$scalars)
   rowNames = base::apply(scalars[rows], 1, paste, collapse='.')

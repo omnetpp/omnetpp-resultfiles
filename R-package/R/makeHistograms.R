@@ -25,7 +25,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-createHistograms <- function (dataset, nameFormat) {
+makeHistograms <- function (dataset, nameFormat) {
   makeHist <- function(key, name) {
       bins <- dataset$bins[dataset$bins$resultkey == key,]
       # remove under/overflow bins
@@ -68,7 +68,7 @@ createHistograms <- function (dataset, nameFormat) {
   data <- merge(getRunsInWideFormat(dataset$runattrs),
                 subset(dataset$statistics, resultkey %in% dataset$bins$resultkey),
                 by='runid')
-  
+
   histogramNames <- getResultItemNames(data, nameFormat)
   hs <- lapply(seq_along(histogramNames),
                function (i) {

@@ -5,21 +5,21 @@ vectorFiles <- c(system.file('extdata', 'OneFifo-0.vec', package='omnetpp'),
                  system.file('extdata', 'TokenRing1-0.vec', package='omnetpp'))
 
 #
-# Scatter chart from OMNeT++ samples/resultfiles/PureAlohaExperiment.anf 
+# Scatter chart from OMNeT++ samples/resultfiles/PureAlohaExperiment.anf
 #
 dataset <- loadDataset(scalarFiles,
              add(type='scalar', select='module(Aloha.server) AND name("channel utilization")'),
              add(type='scalar', select='name(mean)'))
-xydata <- createScatterChartDataset(dataset, xModule='.', xName='mean', isoAttrs='numHosts', averageReplications=TRUE)
+xydata <- makeScatterChartDataset(dataset, xModule='.', xName='mean', isoAttrs='numHosts', averageReplications=TRUE)
 plotLineChart(xydata, list(X.Axis.Title='Mean packet interarrival time', Y.Axis.Title='Utilization'))
 
 
 #
-# Histogram from OMNeT++ samples/resultfiles/PureAlohaExperiment.anf 
+# Histogram from OMNeT++ samples/resultfiles/PureAlohaExperiment.anf
 #
 dataset <- loadDataset(file.path(system.file('extdata', package='omnetpp'), 'PureAlohaExperiment-*.sca'),
              add('statistic', 'module(Aloha.server) AND name("collision multiplicity") AND run(PureAlohaExperiment-1-*)'))
-histograms <- createHistograms(dataset)
+histograms <- makeHistograms(dataset)
 plotHistogramChart(histograms, list(X.Axis.Title='number of colliding packets', Y.Axis.Title='number of times occured'))
 
 #
@@ -34,7 +34,7 @@ plotLineChart(split(data$vectordata, data$vectordata$resultkey), list(X.Axis.Tit
 #
 dataset <- loadDataset(scalarFiles, add('scalar', 'module("Aloha.server") AND file(*PureAlohaExperiment-4*.sca)'))
 print(dataset)
-d <- createBarChartDataset(dataset, rows=c('measurement'), columns=c('name'))
+d <- makeBarChartDataset(dataset, rows=c('measurement'), columns=c('name'))
 par(mfrow=c(2,2))
 plotBarChart(d, list(Legend.Display='true', Legend.Anchoring='NorthWest'))
 plotBarChart(d, list(Bar.Placement='Stacked'))

@@ -27,7 +27,7 @@
 
 # input:  scalars, xdata, iso params, average-replications
 # output: list of two column matrices (x,y), elements named by series key
-createScatterChartDataset <- function (dataset, xModule, xName, isoModules=character(0), isoNames=character(0), isoAttrs=character(0), averageReplications=FALSE) {
+makeScatterChartDataset <- function (dataset, xModule, xName, isoModules=character(0), isoNames=character(0), isoAttrs=character(0), averageReplications=FALSE) {
 
   # group scalars according to iso scalars/attributes
   groupScalars <- function(scalars) {
@@ -36,18 +36,18 @@ createScatterChartDataset <- function (dataset, xModule, xName, isoModules=chara
     i2 <- match(scalars$name, isoNames, nomatch=-1)
     isoScalarIndeces <- which(i1 == i2)
     isoScalars <- scalars[isoScalarIndeces,]
-    otherScalars <- if(length(isoScalarIndeces)>0) scalars[-isoScalarIndeces,] else scalars 
-    
+    otherScalars <- if(length(isoScalarIndeces)>0) scalars[-isoScalarIndeces,] else scalars
+
     # join run attributes and iso scalars
     # TODO iso scalars
     scalarsWithRuns <- merge(omnetpp:::getRunsInWideFormat(dataset$runattrs), otherScalars, by='runid')
-    
+
     # split according to the values of the iso attributes
     s <- if (length(isoAttrs)>0)
            split(scalarsWithRuns, scalarsWithRuns[[isoAttrs]])
          else
            list(scalarsWithRuns)
-    
+
     if (averageReplications) {
       lapply(s,
              function(data) {
@@ -79,7 +79,7 @@ createScatterChartDataset <- function (dataset, xModule, xName, isoModules=chara
       lines <- lines[sapply(lines,length) > 0]
       lines
   }
-  
+
   # TODO line names
   #   '<module> <name> - <isoModule> <isoName>=<value> <isoAttr>=<value>'
   do.call(c, lapply(groupScalars(dataset$scalars), sortScalars))

@@ -25,13 +25,13 @@
 % SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 %
 
-\name{createBarChartDataset}
-\alias{createBarChartDataset}
+\name{makeBarChartDataset}
+\alias{makeBarChartDataset}
 \title{Create a bar chart dataset from scalars}
 \description{
   Create a bar chart dataset from scalars by grouping them according their attributes.
 }
-\usage{createBarChartDataset(dataset, rows, columns, aggregate='mean')}
+\usage{makeBarChartDataset(dataset, rows, columns, aggregate='mean')}
 \arguments{
     \item{dataset}{an object of class "dataset", holding the scalars and runs. (See \code{\link{loadDataset}})}
     \item{rows}{a charater vector holding the field names which identifies the rows of the result.}
@@ -58,7 +58,7 @@
 
 \examples{
 d <- loadDataset(system.file('extdata/PureAloha1-0.sca', package='omnetpp'), add('scalar'))
-createBarChartDataset(d, rows=c('module','experiment','measurement'), columns='name')
+makeBarChartDataset(d, rows=c('module','experiment','measurement'), columns='name')
 }
 
 \keyword{manip}

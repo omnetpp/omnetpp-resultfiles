@@ -25,34 +25,43 @@
 % SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 %
 
-\name{createScatterChartDataset}
-\alias{createScatterChartDataset}
-\title{Create an XY data from scalars.}
+\name{makeHistograms}
+\alias{makeHistograms}
+\title{Build histogram objects from histogram bins.}
 \description{
-  Arranges scalars into an XY grid and optionally averages scalars from different
-  replications of the same measurement.
+  Build histogram objects from histogram bins.
 }
-\usage{createScatterChartDataset(dataset, xModule, xName, isoModules, isoNames,
-                                 isoAttrs, averageReplications=FALSE)}
+\usage{makeHistograms(dataset, nameFormat)}
 \arguments{
-    \item{dataset}{Object of class "dataset", holding the scalars and runs.}
-    \item{xModule}{module name of the scalar on the X axis}
-    \item{xName}{name of the scalar on the X axis}
-    \item{isoModules}{module names of the scalars of the iso lines}
-    \item{isoNames}{names of the scalars of the iso lines}
-    \item{isoAttrs}{names of iso run attributes}
-    \item{averageReplications}{if TRUE then scalars from runs of the same measurement are averaged.}
+    \item{dataset}{an object of class "dataset" with 'statistics', 'fields' and 'bins' components.}
+    \item{nameFormat}{an optional format string for the histogram names, e.g. "$\{module\} $\{name\}".}
+}
+
+\details{
+  Builds histogram objects from a dataset loaded by \code{\link{loadDataset}}.
 }
 
 \value{
-  A list of dataframes (one dataframe for each iso value). Each dataframe contains
-  the X values in the first column and has an additional column for each non-iso scalars.
+  A list of histogram objects.
+  A histogram is an object is a list of class "histogram" with the following components (see \code{\link{hist}}):
+
+  \item{breaks}{cell boundaries}
+  \item{counts}{cell counts, may be fractional}
+  \item{density}{estimated density values}
+  \item{intensities}{same as 'density', for compatibility with \code{\link{hist}}}
+  \item{mids}{the cell midpoints}
+  \item{xname}{a character string with the histogram name}
+  \item{equidist}{logical, indicating if the distances between 'breaks' are all the same.}
+  \item{summary}{a numeric vector with components named 'mean', 'min', 'max', 'variance', 'stddev'}
+  \item{overflowCount}{number of samples above the last break, or NULL}
+  \item{underflowCount}{number of samples below the first break, or NULL}
 }
 
+\seealso{\code{\link{loadDataset}}, \code{\link{hist}}}
+
 \examples{
-d <- loadDataset('Aloha.sca', add(type='scalar'))
-createScatterChartDataset(d, xModule='.', xName='iaTime', isoModules='.',
-                          isoNames='numHosts', averageReplications=TRUE)
+data <- loadDataset('queue.sca', add('statistic'))
+hists <- makeHistograms(data)
 }
 
 \keyword{manip}

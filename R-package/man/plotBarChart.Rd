@@ -55,7 +55,7 @@
 
 \examples{
 d <- loadDataset(system.file('extdata/PureAloha1-0.sca', package='omnetpp'), add('scalar'))
-b <- createBarChartDataset(d, rows=c('module','experiment','measurement'))
+b <- makeBarChartDataset(d, rows=c('module','experiment','measurement'))
 plotBarChart(b, list(Graph.Title='aloha'))
 }
 
