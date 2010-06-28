@@ -1,0 +1,918 @@
+\title{Omnetpp R Package Tutorial}
+\center{author: Andras Varga}
+
+
+\section{Introduction}
+
+This is a tutorial for the "omnetpp" R package. R (http://r-project.org) is a 
+powerful open-source software environment for statistical computing and graphics,
+and the "omnetpp" package was written to facilitate evaluating OMNeT++ simulation 
+results in R. The package supports loading the contents of OMNeT++ result files 
+into R, organizing the data and creating various plots from them.
+
+This tutorial was meant primarily for R newbies, as R can be intimidating at first.
+Experienced R users may find that I am explaining some basic R syntax and concepts 
+they are already familiar with.
+
+
+\section{Getting Started}
+
+First, install the package into R (note the capital letters!):
+
+\begin{verbatim}
+$ R CMD INSTALL omnetpp_0.1-1.tar.gz
+\end{verbatim}
+
+If you ever need to deinstall it, you can do that with
+
+\begin{verbatim}
+$ R CMD REMOVE omnetpp
+\end{verbatim}
+
+Start R:
+
+\begin{verbatim}
+$ R
+\end{verbatim}
+
+and load the OMNeT++ extension library by typing the following command at the R prompt (">"):
+
+\begin{verbatim}
+> require(omnetpp)
+Loading required package: omnetpp
+\end{verbatim}
+
+Getting help:
+
+\begin{verbatim}
+> ?omnetpp
+\end{verbatim}
+
+displays a short description of the package, and hints that the
+
+\begin{verbatim}
+> library(help="omnetpp")
+\end{verbatim}
+
+command lists all commands contributed by this package:
+
+\begin{verbatim}
+> library(help="omnetpp")
+
+                Information on package 'omnetpp'
+
+Description:
+
+Package:       omnetpp
+Version:       0.1-1
+<snip>
+
+Index:
+
+filters                 Filters
+loadDataset             Loads data from result files
+loadVectors             Loads vector data from result files and applies
+                        some processing
+makeBarChartDataset     Create a bar chart dataset from scalars
+makeHistograms          Build histogram objects from histogram bins.
+makeScatterChartDataset Create XY data from scalars.
+omnetpp-package         The OMNeT++ Package
+patterns                Pattern language
+plotBarChart            Plots a bar chart.
+plotHistogramChart      Plot a histogram chart.
+plotLineChart           Plots a line chart.
+\end{verbatim}
+
+You can also watch the demos:
+
+\begin{verbatim}
+> demo(dataset, package='omnetpp')
+> demo(charts, package='omnetpp')
+\end{verbatim}
+
+For this tutorial, I gathered some OMNeT++ result files in the directory
+in the \ttt{rtut/} subdir of my home directory. Let us change first into that
+directory so that we can access the files without having to specify
+full path. This is possible by quitting R (\ttt{q()} command or Ctrl+D),
+changing into that directory at the shell prompt and restarting R,
+but it can also be done from within R:
+
+\begin{verbatim}
+> setwd("~/rtut")
+> getwd()
+[1] "/home/andras/rtut"
+> list.files()
+[1] "OneFifo-0.vci"             "OneFifo-0.vec"
+[3] "PureAlohaExperiment-0.sca" "PureAlohaExperiment-1.sca"
+[5] "PureAlohaExperiment-2.sca" "TokenRing1-0.vci"
+[7] "TokenRing1-0.vec"
+\end{verbatim}
+
+Note that the dot is just a normal character in R without a special meaning:
+\ttt{list.files()} is just a plain identifier, and the function could as well
+have been called \ttt{list_files()} or \ttt{listFiles()}. The "member selector"
+operator (which is the dot character in C and many other languages) is the
+dollar character (\ttt{\$}) in R.
+
+Now, we load the contents of some result files into an R data structure, using
+the \ttt{loadDataset()} command from the omnetpp package:
+
+\begin{verbatim}
+> x <- loadDataset("*.sca")
+\end{verbatim}
+
+\ttt{loadDataset()}'s first argument can also be a string vector, which allows you
+to specify several file names or wildcard patterns:
+
+\begin{verbatim}
+> tmp <- loadDataset( c("*.sca", "OneFifo-*.vec", "TokenRing1-*.vec") )
+\end{verbatim}
+
+where \ttt{c()} is the R syntax for combining several values into a vector.
+\ttt{loadDataset()} also lets you specify filter criteria if you only want to load
+a subset of the data from the files. You can filter by module name, result item name
+and other criteria; will have a look at this feature later.
+
+
+Let's have a look at the x variable that contains the dataset we loaded from \ttt{"*.sca"}.
+We can print its contents by simply typing the variable's name:
+
+\begin{verbatim}
+> x
+...
+\end{verbatim}
+
+The output is quite long. However, you can notice that it is a list of several
+components, where each component is a table that R calls "data frame".
+The tables are named "scalars", "vectors", "fields", "fileruns", etc.
+The names can be displayed with the
+
+\begin{verbatim}
+> names(x)
+[1] "runattrs"   "fileruns"   "scalars"    "vectors"    "statistics"
+[6] "fields"     "bins"       "params"     "attrs"
+\end{verbatim}
+
+command, and individual components can be printed with the \$ notation:
+
+\begin{verbatim}
+> x$fileruns
+                                          runid                      file
+1 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca
+2 PureAlohaExperiment-2-20100427-16:30:17-25289 PureAlohaExperiment-2.sca
+3 PureAlohaExperiment-1-20100427-16:30:16-25283 PureAlohaExperiment-1.sca
+
+> x$scalars
+   resultkey                                         runid                      file       module                    name        value
+1          0 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca            .                    mean 1.000000e+00
+2          1 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca            .                numHosts 1.000000e+01
+3          2 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca Aloha.server                duration 5.400007e+03
+4          3 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca Aloha.server    collisionLength:mean 1.969656e-01
+5          4 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca Aloha.server     collisionLength:sum 2.415980e+03
+6          5 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca Aloha.server     collisionLength:max 8.734217e-01
+7          6 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca Aloha.server     collidedFrames:last 3.992800e+04
+...
+
+> x$attrs
+    attrtype resultkey          attrname                         attrvalue
+1     scalar         3             title            collision length, mean
+2     scalar         4             title             collision length, sum
+3     scalar         5             title             collision length, max
+4     scalar         6            source                    sum(collision)
+5     scalar         6             title             collided frames, last
+6     scalar         7 interpolationmode                            linear
+7     scalar         7            source                  timeavg(receive)
+...
+\end{verbatim}
+
+You may notice that this data structure looks like a relational database, with
+the "runid" and "resultkey" colums being keys that relate tables to each other.
+Indeed, R makes it simple to "join" tables (in the SQL sense); we'll show this later.
+
+If you are worried about the memory consumption of the above tables due to many
+repeated copies of run IDs, file names, module names, etc, you generally shouldn't be:
+R internally stores the distinct values in a lookup table, and the data frame's rows
+only contain integers that are indices into the internal tables.
+
+At this point, R's default display width of 80 characters may have resulted in wrapping
+of the tables. Some R versions automatically adapt the display width to the width of the
+terminal window, but if yours doesn't, you can increase the display width with the
+following command:
+
+\begin{verbatim}
+> options(width=120)
+\end{verbatim}
+
+
+
+\section{Exploring the Loaded Scalars}
+
+In the section above, we have loaded a bunch of scalar files with the
+
+\begin{verbatim}
+> x <- loadDataset("*.sca")
+\end{verbatim}
+
+command into the variable x, and seen that scalar values are in its "scalars" data frame,
+\ttt{x\$scalars}. Let's examine the scalar values a little!
+
+Individual columns of a data frame can also be selected with the \$ notation,
+so the values of all output scalars can be displayed with \ttt{x\$scalars\$value}:
+
+\begin{verbatim}
+> names(x$scalars)
+[1] "resultkey" "runid"     "file"      "module"    "name"      "value"
+
+> x$scalars$value
+ [1] 1.000000e+00 1.000000e+01 5.400007e+03 1.969656e-01 2.415980e+03
+ [6] 8.734217e-01 3.992800e+04 1.612558e-01 8.781000e+03 1.000000e+00
+[11] 1.000000e+01 5.400023e+03 1.980867e-01 2.449936e+03 1.193256e+00
+[16] 4.054700e+04 1.582669e-01 8.618000e+03 2.000000e+00 1.000000e+01
+[21] 5.400176e+03 1.682003e-01 9.881766e+02 6.155766e-01 1.463500e+04
+[26] 1.944002e-01 1.058300e+04
+\end{verbatim}
+
+We store the values in a separate variable:
+
+\begin{verbatim}
+> v <- x$scalars$value
+\end{verbatim}
+
+and calculate some statistical properties:
+
+\begin{verbatim}
+> min(v)
+[1] 0.1582669
+> max(v)
+[1] 40547
+> sum(v)
+[1] 145184.1
+> length(v)
+[1] 27
+> mean(v)
+[1] 5377.187
+> var(v)
+[1] 116749219
+> sd(v)
+[1] 10805.06
+\end{verbatim}
+
+R also has a function that computes a statistical summary in one step:
+
+\begin{verbatim}
+> summary(v)
+     Min.   1st Qu.    Median      Mean   3rd Qu.      Max.
+1.583e-01 7.445e-01 1.000e+01 5.377e+03 5.400e+03 4.055e+04
+\end{verbatim}
+
+\ttt{v} is a normal vector variable. The index operator has the usual bracket
+syntax (\ttt{[]}) and works as expected, except that indexing is 1-based
+(not 0-based as in C), and ranges are also accepted:
+
+\begin{verbatim}
+> v[3]
+[1] 5400.007
+> 1:3
+[1] 1 2 3
+> v[1:3]
+[1]    1.000   10.000 5400.007
+\end{verbatim}
+
+The index operator also accepts a boolean vector that selects which elements
+of the vector you want to obtain. For example, the following example selects
+all elements that are larger than 100:
+
+\begin{verbatim}
+> v > 100
+ [1] FALSE FALSE  TRUE FALSE  TRUE FALSE  TRUE FALSE  TRUE FALSE FALSE  TRUE
+[13] FALSE  TRUE FALSE  TRUE FALSE  TRUE FALSE FALSE  TRUE FALSE  TRUE FALSE
+[25]  TRUE FALSE  TRUE
+> v[v>100]
+ [1]  5400.0073  2415.9798 39928.0000  8781.0000  5400.0235  2449.9358
+ [7] 40547.0000  8618.0000  5400.1756   988.1766 14635.0000 10583.0000
+\end{verbatim}
+
+This feature can be used for more complex queries as well, like selecting those
+elements that are within 90\% of the maximum:
+
+\begin{verbatim}
+> v[v>=0.9*max(v)]
+[1] 39928 40547
+\end{verbatim}
+
+Of course, the above queries are not very meaningful, because we lumped together
+all scalar result items, mixing apples with oranges. In an effort to fix this,
+let's see first what names occur in our scalar results:
+
+\begin{verbatim}
+> levels(x$scalars$name)
+[1] "channelUtilization:last" "collidedFrames:last"
+[3] "collisionLength:max"     "collisionLength:mean"
+[5] "collisionLength:sum"     "duration"
+[7] "mean"                    "numHosts"
+[9] "receivedFrames:last"
+\end{verbatim}
+
+To select scalars with a specific name (e.g. \ttt{receivedFrames:last}), we can use the
+indexing operator again (note the comma before the close bracket!):
+
+\begin{verbatim}
+> receivedFrames <- x$scalars[x$scalars$name == "receivedFrames:last",]
+> receivedFrames
+   resultkey                                         runid                      file       module                name value
+9          8 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca Aloha.server receivedFrames:last  8781
+18        17 PureAlohaExperiment-1-20100427-16:30:16-25283 PureAlohaExperiment-1.sca Aloha.server receivedFrames:last  8618
+27        26 PureAlohaExperiment-2-20100427-16:30:17-25289 PureAlohaExperiment-2.sca Aloha.server receivedFrames:last 10583
+
+> mean(receivedFrames$value)
+[1] 9327.333
+\end{verbatim}
+
+The selection worked because rows of a data frame can also be addressed with the
+\ttt{[]} operator (which accepts indices and a boolean array as well):
+
+\begin{verbatim}
+> x$scalars[5,]
+  resultkey                                         runid                      file       module                name   value
+5         4 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca Aloha.server collisionLength:sum 2415.98
+> \end{verbatim}
+
+You can filter by module name, file name or run ID in the same way.
+
+
+\section{Load-Time Dataset Filtering}
+
+The \ttt{loadDataset()} function can do filtering on the fly, i.e. you can specify 
+which data in the file(s) you want to be present in the result dataset. This is done
+by giving a second argument to \ttt{loadDataset()}, a list of \ttt{add} and \ttt{discard}
+nodes. Within an \ttt{add} or \ttt{discard} one can specify the result type (scalar, vector, 
+statistic), and a filter pattern that can match result item names, module names, etc.
+An example:
+
+\begin{verbatim}
+> loadDataset(c('Aloha-1.sca', 'Aloha-2.sca', 'PureAloha1-*.vec'),
+       add(type='scalar', select='module(Aloha.server)'),
+       add('vector'),
+       discard('vector', 'name("channel utilization")')
+     )
+\end{verbatim}
+
+The pattern language is the same that is used in various places in the IDE's Analysis Editor 
+(e.g. in the Advanced Filter on the Browse Data page) and also in scavetool. You can get help
+about the pattern language by typing \ttt{?patterns} in R.
+
+
+\section{Reorganizing the Data}
+
+R provides many interesting ways to reorganize data in data frames, which can often be handy.
+
+The \ttt{split()} function groups data by some criteria, and produces a list of data frames.
+The criteria can be a column name as well. For example, the following command groups our
+scalars by runs:
+
+\begin{verbatim}
+> split(x$scalars, x$scalars$runid)
+$`PureAlohaExperiment-0-20100427-16:30:15-25274`
+  resultkey                                         runid                      file       module        name        value
+1         0 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca            .        mean 1.000000e+00
+2         1 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca            .    numHosts 1.000000e+01
+3         2 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca Aloha.server    duration 5.400007e+03
+...
+
+$`PureAlohaExperiment-1-20100427-16:30:16-25283`
+   resultkey                                         runid                      file       module       name        value
+10         9 PureAlohaExperiment-1-20100427-16:30:16-25283 PureAlohaExperiment-1.sca            .       mean 1.000000e+00
+11        10 PureAlohaExperiment-1-20100427-16:30:16-25283 PureAlohaExperiment-1.sca            .   numHosts 1.000000e+01
+12        11 PureAlohaExperiment-1-20100427-16:30:16-25283 PureAlohaExperiment-1.sca Aloha.server   duration 5.400023e+03
+...
+
+$`PureAlohaExperiment-2-20100427-16:30:17-25289`
+   resultkey                                         runid                      file       module       name        value
+19        18 PureAlohaExperiment-2-20100427-16:30:17-25289 PureAlohaExperiment-2.sca            .       mean 2.000000e+00
+20        19 PureAlohaExperiment-2-20100427-16:30:17-25289 PureAlohaExperiment-2.sca            .   numHosts 1.000000e+01
+21        20 PureAlohaExperiment-2-20100427-16:30:17-25289 PureAlohaExperiment-2.sca Aloha.server   duration 5.400176e+03
+...
+\end{verbatim}
+
+Or we can split by module name, to see which statistics each module wrote:
+
+\begin{verbatim}
+> split(x$scalars, x$scalars$module)
+$.
+   resultkey                                         runid                      file module     name value
+1          0 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca      .     mean     1
+2          1 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca      . numHosts    10
+10         9 PureAlohaExperiment-1-20100427-16:30:16-25283 PureAlohaExperiment-1.sca      .     mean     1
+11        10 PureAlohaExperiment-1-20100427-16:30:16-25283 PureAlohaExperiment-1.sca      . numHosts    10
+19        18 PureAlohaExperiment-2-20100427-16:30:17-25289 PureAlohaExperiment-2.sca      .     mean     2
+20        19 PureAlohaExperiment-2-20100427-16:30:17-25289 PureAlohaExperiment-2.sca      . numHosts    10
+
+$Aloha.server
+   resultkey                                         runid                      file       module                    name        value
+3          2 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca Aloha.server                duration 5.400007e+03
+4          3 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca Aloha.server    collisionLength:mean 1.969656e-01
+5          4 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca Aloha.server     collisionLength:sum 2.415980e+03
+...
+\end{verbatim}
+
+R also provides an \ttt{unsplit()} function that reverses the effect of \ttt{split()}.
+
+Another interesting function is \ttt{reshape()}, which can turn a "long" table
+into a "wide" one, by taking distinct values from a column and turning them
+into separate columns. We better show this on another table, \ttt{x\$runattrs},
+which contains the run attributes for each simulation run:
+
+\begin{verbatim}
+> x$runattrs
+                                           runid       attrname                               attrvalue
+1  PureAlohaExperiment-0-20100427-16:30:15-25274     configname                     PureAlohaExperiment
+2  PureAlohaExperiment-0-20100427-16:30:15-25274       datetime                       20100427-16:30:15
+3  PureAlohaExperiment-0-20100427-16:30:15-25274     experiment                     PureAlohaExperiment
+4  PureAlohaExperiment-0-20100427-16:30:15-25274        inifile                             omnetpp.ini
+5  PureAlohaExperiment-0-20100427-16:30:15-25274  iterationvars                   $numHosts=10, $mean=1
+...
+17 PureAlohaExperiment-1-20100427-16:30:16-25283     configname                     PureAlohaExperiment
+18 PureAlohaExperiment-1-20100427-16:30:16-25283       datetime                       20100427-16:30:16
+19 PureAlohaExperiment-1-20100427-16:30:16-25283     experiment                     PureAlohaExperiment
+20 PureAlohaExperiment-1-20100427-16:30:16-25283        inifile                             omnetpp.ini
+21 PureAlohaExperiment-1-20100427-16:30:16-25283  iterationvars                   $numHosts=10, $mean=1
+...
+\end{verbatim}
+
+Reshaping can turn this into a table where each run has one row, and the table has
+a "runid" column plus columns like "configname", "datatime", "experiment", etc.,
+one for each run attribute. (The output has been broken to multiple lines, due to the 
+large number of columns.)
+
+\begin{verbatim}
+> reshape(x$runattrs, idvar="runid", timevar="attrname", direction="wide")
+
+                                           runid attrvalue.configname attrvalue.datetime attrvalue.experiment
+1  PureAlohaExperiment-1-20100427-16:30:16-25283  PureAlohaExperiment  20100427-16:30:16  PureAlohaExperiment
+17 PureAlohaExperiment-2-20100427-16:30:17-25289  PureAlohaExperiment  20100427-16:30:17  PureAlohaExperiment
+33 PureAlohaExperiment-0-20100427-16:30:15-25274  PureAlohaExperiment  20100427-16:30:15  PureAlohaExperiment
+
+   attrvalue.inifile attrvalue.iterationvars             attrvalue.iterationvars2 attrvalue.mean attrvalue.measurement
+1        omnetpp.ini   $numHosts=10, $mean=1 $numHosts=10, $mean=1, $repetition=1              1 $numHosts=10, $mean=1
+17       omnetpp.ini   $numHosts=10, $mean=2 $numHosts=10, $mean=2, $repetition=0              2 $numHosts=10, $mean=2
+33       omnetpp.ini   $numHosts=10, $mean=1 $numHosts=10, $mean=1, $repetition=0              1 $numHosts=10, $mean=1
+
+   attrvalue.network attrvalue.numHosts attrvalue.processid attrvalue.repetition attrvalue.replication
+1              Aloha                 10               25283                    1                    #1
+17             Aloha                 10               25289                    0                    #0
+33             Aloha                 10               25274                    0                    #0
+
+   attrvalue.resultdir attrvalue.runnumber attrvalue.seedset
+1              results                   1                 1
+17             results                   2                 2
+33             results                   0                 0
+\end{verbatim}
+
+A similar command can be used to produce a table where each scalar is a column
+and there are rows for distinct (run ID, module name) pairs, or a table where
+each run has maps to one row and columns names are concatenations of a module name
+and a scalar name.
+
+The following lines implement the second one. The code first adds a new "qname"
+column to a copy of the scalars table to contain "modulename/scalarname" strings
+(\ttt{paste()} is R for string concatenation), and executes \ttt{reshape()} on it,
+dropping the unnecessary columns:
+
+\begin{verbatim}
+> xs <- x$scalars
+> xs$qname <- paste(xs$module, xs$name, sep="/")
+> reshape(xs, idvar="runid", timevar="qname", direction="wide", drop=c("resultkey", "name", "module", "file"))
+\end{verbatim}
+
+
+\section{Combining Data Frames}
+
+We have seen that the loaded dataset contains several tables (data frames):
+
+\begin{verbatim}
+> names(x)
+[1] "runattrs"   "fileruns"   "scalars"    "vectors"    "statistics"
+[6] "fields"     "bins"       "params"     "attrs"
+\end{verbatim}
+
+As for some queries it is necessary to combine the information in these tables,
+let's examine what they contain. We have seen "scalars": it contains output scalars,
+together with the file and run they were loaded from.
+
+"vectors" is similar: it contains the list of output vectors recorded, together
+with the file and run they were loaded from. However, it does not contain the
+actual data: as the amount of data in vectors can be quite large, it can be read
+with a separate command (\ttt{loadVectors()}) that also supports some filtering
+and processing that can reduce the amount of data to be read into memory.
+
+"statistics" contains the names of recorded statistical summaries and histograms,
+together with file and run info. The actual data are in the "fields" table that
+contains fields like "count", "sum", "sqrsum", "min", "max", etc. Histogram bins
+are in the "bins" table.
+
+Attributes (metadata annotation such as "unit", "interpolationmode", "title") for
+scalars, vectors, and statistics/histograms are in the "attrs" table.
+
+Result items (i.e. scalars, vectors, and statistics/histograms) are identified with
+a unique "resultkey" column in their tables; "resultkey" is unique within the dataset.
+The "fields", "bins" and "attrs" tables also contain a "resultkey" column to
+identify which row belongs to which vector or scalar or statistic.
+
+Files are identified with the file name, and runs with the run ID ("runid" column).
+They are in many-to-many relationship: one simulation run may write to more than
+one file (typically a scalar and a vector file, or several of each in the case of
+distributed simulations), and a file may contain data from several runs (although it
+usually does not). The "fileruns" table contains the valid (file, run) pairs,
+i.e. which run has data in which files.
+
+Finally, there is a "runattrs" table that contains the values of run attributes,
+where the "runid" column identifies which run each row belongs to.
+
+The tables have the following columns (we apply the \ttt{names()} function to
+elements of the dataset to get this info):
+
+\begin{verbatim}
+> sapply(x,names)
+
+$runattrs
+[1] "runid"     "attrname"  "attrvalue"
+
+$fileruns
+[1] "runid" "file"
+
+$scalars
+[1] "resultkey" "runid"     "file"      "module"    "name"      "value"
+
+$vectors
+[1] "resultkey" "runid"     "file"      "vectorid"  "module"    "name"
+
+$statistics
+[1] "resultkey" "runid"     "file"      "module"    "name"
+
+$fields
+[1] "resultkey"  "fieldname"  "fieldvalue"
+
+$bins
+[1] "resultkey"  "lowerbound" "upperbound" "count"
+
+$params
+[1] "runid" "name"  "value"
+
+$attrs
+[1] "attrtype"  "resultkey" "attrname"  "attrvalue"
+\end{verbatim}
+
+You can see that there is no dedicated "runs" or "files" table; the list of
+files and runs can be obtained from the "fileruns" table:
+
+\begin{verbatim}
+> levels(x$fileruns$file)
+[1] "PureAlohaExperiment-0.sca" "PureAlohaExperiment-1.sca" "PureAlohaExperiment-2.sca"
+
+> levels(x$fileruns$runid)
+[1] "PureAlohaExperiment-0-20100427-16:30:15-25274" "PureAlohaExperiment-1-20100427-16:30:16-25283"
+[3] "PureAlohaExperiment-2-20100427-16:30:17-25289"
+\end{verbatim}
+
+R has built-in support for "joining" tables (in the SQL sense). The corresponding
+R function is called \ttt{merge()}, and one of its pleasant properties is that it
+automatically figures out which columns to join by (it uses the column names that
+occur in both tables).
+
+For example, merging the "fileruns" and "runattrs" tables results in the following:
+
+\begin{verbatim}
+> merge(x$fileruns, x$runattrs)
+                                           runid                      file       attrname              attrvalue
+1  PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca      processid                  25274
+2  PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca     repetition                      0
+3  PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca    replication                     #0
+4  PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca     configname    PureAlohaExperiment
+5  PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca       datetime      20100427-16:30:15
+6  PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca     experiment    PureAlohaExperiment
+7  PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca        inifile            omnetpp.ini
+8  PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca  iterationvars  $numHosts=10, $mean=1
+...
+17 PureAlohaExperiment-1-20100427-16:30:16-25283 PureAlohaExperiment-1.sca     configname    PureAlohaExperiment
+18 PureAlohaExperiment-1-20100427-16:30:16-25283 PureAlohaExperiment-1.sca       datetime      20100427-16:30:16
+19 PureAlohaExperiment-1-20100427-16:30:16-25283 PureAlohaExperiment-1.sca     experiment    PureAlohaExperiment
+20 PureAlohaExperiment-1-20100427-16:30:16-25283 PureAlohaExperiment-1.sca        inifile            omnetpp.ini
+21 PureAlohaExperiment-1-20100427-16:30:16-25283 PureAlohaExperiment-1.sca  iterationvars  $numHosts=10, $mean=1
+...
+\end{verbatim}
+
+and merging "statistics" and "fields" results in this:
+
+\begin{verbatim}
+> merge(x$statistics, x$fields)
+   resultkey                                         runid                      file       module                            name fieldname   fieldvalue
+1         27 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca Aloha.server       collisionLength:histogram     count 1.226600e+04
+2         27 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca Aloha.server       collisionLength:histogram       max 8.734217e-01
+3         27 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca Aloha.server       collisionLength:histogram      mean 1.969656e-01
+4         27 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca Aloha.server       collisionLength:histogram       min 9.916972e-02
+5         27 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca Aloha.server       collisionLength:histogram    sqrsum 5.692561e+02
+6         27 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca Aloha.server       collisionLength:histogram    stddev 8.726083e-02
+7         27 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca Aloha.server       collisionLength:histogram       sum 2.415980e+03
+8         28 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca Aloha.server collisionMultiplicity:histogram     count 1.226600e+04
+9         28 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca Aloha.server collisionMultiplicity:histogram       max 1.900000e+01
+10        28 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca Aloha.server collisionMultiplicity:histogram      mean 3.255177e+00
+\end{verbatim}
+
+Then you can filter the rows of the resulting table by indexing with logical indixes.
+For example, to keep the "count" and "mean" colums only, you could enter:
+
+\begin{verbatim}
+> sf <- merge(x$statistics, x$fields)
+> sf <- sf[sf$fieldname=="count" | sf$fieldname=="mean",]
+\end{verbatim}
+
+Note that we used "\ttt{|}" and not "\ttt{||}"! The latter operator also exists,
+but is not useful here.
+
+Now, if you would like to augment the "statistics" table with the mean, sum,
+standard deviation, min, max, etc. columns, the following two lines will do it
+for you (we use \ttt{reshape()} that's been covered before):
+
+\begin{verbatim}
+> widefields <- reshape(x$fields, idvar="resultkey", timevar="fieldname", direction="wide")
+> merge (x$statistics, widefields)
+  resultkey                                         runid                      file       module
+1        27 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca Aloha.server
+2        28 PureAlohaExperiment-0-20100427-16:30:15-25274 PureAlohaExperiment-0.sca Aloha.server
+3        29 PureAlohaExperiment-1-20100427-16:30:16-25283 PureAlohaExperiment-1.sca Aloha.server
+4        30 PureAlohaExperiment-1-20100427-16:30:16-25283 PureAlohaExperiment-1.sca Aloha.server
+5        31 PureAlohaExperiment-2-20100427-16:30:17-25289 PureAlohaExperiment-2.sca Aloha.server
+6        32 PureAlohaExperiment-2-20100427-16:30:17-25289 PureAlohaExperiment-2.sca Aloha.server
+                             name fieldvalue.count fieldvalue.max fieldvalue.mean fieldvalue.min fieldvalue.sqrsum
+1       collisionLength:histogram            12266      0.8734217       0.1969656     0.09916972          569.2561
+2 collisionMultiplicity:histogram            12266     19.0000000       3.2551769     2.00000000       163976.0000
+3       collisionLength:histogram            12368      1.1932558       0.1980867     0.09919746          581.5508
+4 collisionMultiplicity:histogram            12368     22.0000000       3.2783797     2.00000000       168555.0000
+5       collisionLength:histogram             5875      0.6155766       0.1682003     0.09919544          183.2873
+6 collisionMultiplicity:histogram             5875      9.0000000       2.4910638     2.00000000        40809.0000
+  fieldvalue.stddev fieldvalue.sum
+1        0.08726083      2415.9798
+2        1.66504791     39928.0000
+3        0.08822078      2449.9358
+4        1.69728446     40547.0000
+5        0.05391656       988.1766
+6        0.86077865     14635.0000
+\end{verbatim}
+
+Augmenting the "scalars" table with, say, the "experiment", "measurement" and "replication"
+run attributes can be done in a similar way.
+
+
+\section{Using SQL}
+
+If you are familiar with relational databases, you might prefer to use SQL instead of
+R expressions. The "sqldf" R package lets you view data frames as database tables,
+and query them with SELECT statements. An example session:
+
+\begin{verbatim}
+> install.packages("sqldf")
+...
+> require(sqldf)
+Loading required package: sqldf
+...
+> attach(x)
+> sqldf("select runid, module, name, value from scalars")
+                                           runid       module                    name        value
+1  PureAlohaExperiment-0-20100427-16:30:15-25274            .                    mean 1.000000e+00
+2  PureAlohaExperiment-0-20100427-16:30:15-25274            .                numHosts 1.000000e+01
+3  PureAlohaExperiment-0-20100427-16:30:15-25274 Aloha.server                duration 5.400007e+03
+4  PureAlohaExperiment-0-20100427-16:30:15-25274 Aloha.server    collisionLength:mean 1.969656e-01
+...
+
+> sqldf("select s.runid, s.module, s.name, f.fieldname, f.fieldvalue from statistics s, fields f
+where s.resultkey==f.resultkey and f.fieldname=='mean'")
+                                          runid       module                            name fieldname fieldvalue
+1 PureAlohaExperiment-0-20100427-16:30:15-25274 Aloha.server       collisionLength:histogram      mean  0.1969656
+2 PureAlohaExperiment-0-20100427-16:30:15-25274 Aloha.server collisionMultiplicity:histogram      mean  3.2551769
+3 PureAlohaExperiment-1-20100427-16:30:16-25283 Aloha.server       collisionLength:histogram      mean  0.1980867
+4 PureAlohaExperiment-1-20100427-16:30:16-25283 Aloha.server collisionMultiplicity:histogram      mean  3.2783797
+...
+\end{verbatim}
+
+
+\section{Plotting Bar Charts}
+
+Bar charts can be plot with the \ttt{plotBarChart()} function of the \ttt{omnetpp}
+package. This function expects two arguments. The first argument should be 
+a numeric matrix with the data to be plot, where rows are the groups of the 
+bar chart and columns are the bars. The second argument is a properties list
+which defines the title of the chart, axis labels, controls the legend, etc.
+The property names and values are intended to be as close to the properties 
+used by the IDE's Analysis Editor as possible.
+
+The matrix containing the chart data can be created in various ways, using R's 
+data manipulation facilities. The package also contains a \ttt{makeBarChartDataset()}
+function that extracts the data from scalars in a dataset. An example:
+
+\begin{verbatim}
+> bcd <- makeBarChartDataset(x, rows=c('module'), columns='name')
+> plotBarChart(bcd, list(Legend.Display="true"))
+\end{verbatim}
+
+TODO Refine this section of the tutorial.
+
+TODO The example in the help page of \ttt{makeBarChartDataset()} does not work.
+
+
+\section{Plotting Histograms}
+
+The \ttt{loadDataset()} function loads histograms into the "statistics" and "bins" tables,
+which is not really ready for immediate consumption. The \ttt{makeHistograms()} function
+can be used to convert histograms in a dataset into a list of R histogram structures:
+
+\begin{verbatim}
+> hh <- makeHistograms(x)
+\end{verbatim}
+
+The function tries to give unique names to the histograms, assembled from various columns
+of the "statistics" table:
+
+\begin{verbatim}
+> names(hh)
+> names(makeHistograms(x))
+[1] "PureAlohaExperiment-0-20100427-16:30:15-25274 collisionLength:histogram"
+[2] "PureAlohaExperiment-0-20100427-16:30:15-25274 collisionMultiplicity:histogram"
+[3] "PureAlohaExperiment-1-20100427-16:30:16-25283 collisionLength:histogram"
+...
+\end{verbatim}
+
+It is also possible to specify with a format string how the names should be created:
+
+\begin{verbatim}
+> hh <- makeHistograms(x, "${module} ${name}")
+> names(hh)
+[1] "Aloha.server collisionLength:histogram"      
+[2] "Aloha.server collisionMultiplicity:histogram"
+[3] "Aloha.server collisionLength:histogram"      
+...
+\end{verbatim}
+
+TODO: The format string currently does not recognize \ttt{\$\{experiment\}}, 
+\ttt{\$\{measurement\}}, \ttt{\$\{replication\}}, \ttt{\$\{configname\}},
+\ttt{\$\{runnumber\}}, \ttt{\$\{network\}} and other run attributes.
+
+The resulting histogram objects can be plot using R's "plot" function. The
+following command plots the first histogram:
+
+\begin{verbatim}
+> plot(hh[[1]])
+\end{verbatim}
+
+If you want to review all histograms (click through the plots), you can do it with
+the following command:
+
+\begin{verbatim}
+> par(ask=TRUE)
+> sapply(hh, plot)
+\end{verbatim}
+
+The first line is only needed once per session, it tells R to wait between the plots
+(otherwise the histograms would just whizz by).
+
+
+\section{Plotting Vectors}
+
+Let's begin with loading a vector file:
+
+\begin{verbatim}
+> x <-loadDataset("OneFifo*.vec")
+> x$vectors
+   resultkey                             runid          file vectorid            module                          name
+1          0 OneFifo-0-20081210-11:48:12-11130 OneFifo-0.vec        9 SimpleQueue.queue                 queueing time
+2          1 OneFifo-0-20081210-11:48:12-11130 OneFifo-0.vec        8 SimpleQueue.queue                        length
+3          2 OneFifo-0-20081210-11:48:12-11130 OneFifo-0.vec        0  SimpleQueue.sink                total lifetime
+4          3 OneFifo-0-20081210-11:48:12-11130 OneFifo-0.vec        1  SimpleQueue.sink           total queueing time
+5          4 OneFifo-0-20081210-11:48:12-11130 OneFifo-0.vec        2  SimpleQueue.sink number of queue nodes visited
+6          5 OneFifo-0-20081210-11:48:12-11130 OneFifo-0.vec        3  SimpleQueue.sink            total service time
+7          6 OneFifo-0-20081210-11:48:12-11130 OneFifo-0.vec        4  SimpleQueue.sink                   total delay
+8          7 OneFifo-0-20081210-11:48:12-11130 OneFifo-0.vec        5  SimpleQueue.sink number of delay nodes visited
+9          8 OneFifo-0-20081210-11:48:12-11130 OneFifo-0.vec        6  SimpleQueue.sink                    generation
+10         9 OneFifo-0-20081210-11:48:12-11130 OneFifo-0.vec        7 SimpleQueue.queue                  dropped jobs
+\end{verbatim}
+
+\ttt{loadDataset()} only loads the vector declarations. The actual vector data can be
+loaded wit the \ttt{loadVectors()} function:
+
+\begin{verbatim}
+> v <- loadVectors(x$vectors)
+\end{verbatim}
+
+If you get the error \ttt{indexed vector file reader: index file is not up to date}, then
+you can use the \ttt{scavetool} program, part of OMNeT++, to index the file:
+
+\begin{verbatim}
+$ scavetool index OneFifo-0.vec
+\end{verbatim}
+
+The \ttt{loadVectors()} function creates a list with three data frames:
+
+\begin{verbatim}
+> names(v)
+[1] "vectors"    "vectordata" "attributes"
+> v
+$vectors
+   resultkey          file vectorid            module                          name
+1          0 OneFifo-0.vec        9 SimpleQueue.queue                 queueing time
+2          1 OneFifo-0.vec        8 SimpleQueue.queue                        length
+3          2 OneFifo-0.vec        0  SimpleQueue.sink                total lifetime
+...
+
+$vectordata
+   resultkey eventno         x          y
+1          0       2  1.199993  0.0000000
+2          0       5  2.540825  0.2951858
+3          0      15  4.565747  1.9815322
+4          0      19  6.454965  3.5643205
+5          0      25 10.279441  6.1744295
+...
+10         1       2  1.199993  0.0000000
+11         1       4  2.245639  1.0000000
+12         1       5  2.540825  0.0000000
+13         1       8  2.584215  1.0000000
+14         1      10  2.890644  2.0000000
+15         1      12  4.105012  3.0000000
+16         1      14  4.436527  4.0000000
+...
+30         2       6  2.540825  1.3408317
+31         2      16  4.565747  2.3201081
+32         2      20  6.454965  3.8707496
+33         2      26 10.279441  7.3887973
+...
+$attrs
+[1] resultkey attrname  attrvalue
+\end{verbatim}
+
+The \ttt{vectordata} component contains data from all vectors.
+One can use \ttt{split()} to split it to separate vectors:
+
+\begin{verbatim}
+> split(v$vectordata, v$vectordata$resultkey)
+$`0`
+   resultkey eventno         x          y
+1          0       2  1.199993  0.0000000
+2          0       5  2.540825  0.2951858
+3          0      15  4.565747  1.9815322
+4          0      19  6.454965  3.5643205
+...
+
+$`1`
+    resultkey eventno         x y
+10          1       2  1.199993 0
+11          1       4  2.245639 1
+12          1       5  2.540825 0
+13          1       8  2.584215 1
+...
+\end{verbatim}
+
+This can be turned into a line chart with the \ttt{plotLineChart()} function:
+
+\begin{verbatim}
+> vs <- split(v$vectordata, v$vectordata$resultkey)
+> plotLineChart(vs, list())
+\end{verbatim}
+
+The second argument to \ttt{plotLineChart()} is a properties list, it can be used
+to set things like axis titles, chart title, grid lines, etc. The property names and 
+values are intended to be as close to the properties used by the IDE's Analysis Editor 
+as possible, to facilitate future interoperability. An example:
+
+\begin{verbatim}
+> plotLineChart(vs, list(X.Axis.Title='t', Y.Axis.Title='value'))
+\end{verbatim}
+
+Otherwise \ttt{plotLineChart()} just calls R's \ttt{plot.new()}, \ttt{plot.window()}, 
+\ttt{lines()}, \ttt{title()} and \ttt{legend()} functions with the appropriate parameters
+(check it with \ttt{fix(plotLineChart)}!
+
+TODO Currently the legend is not really good: as line titles come from the names of
+the split vector data, it simply says "0", "1", "2", etc. Those names can be set 
+by assigning \ttt{names(vs)} (e.g. after issuing \ttt{names(vs) <- paste("Line", names(vs))}
+the legend will say "Line 0", "Line 1", etc), and preferably there should be a function
+that splits "vectordata" and also assigns good names to individual vectors.
+
+The \ttt{loadVectors()} function also supports filtering. For example, the following
+command applies a \ttt{winavg(10)} filter to the vectors:
+
+\begin{verbatim}
+> loadVectors(x$vectors, apply(winavg(10)))
+\end{verbatim}
+
+To see the list of available filters, type \ttt{?filters}.
+
+The filtering occurs while the data are read from disk, and only the result is 
+stored in memory. This allows large vector files to be processed, where even individual 
+vectors contain huge amounts of data.
+
+
+\section{Summary}
+
+This concludes our short tutorial. Please help us make this tutorial and the R package useful,
+and contribute suggestions, improvements, bug fixes, new utility functions, etc!
+
+
+
