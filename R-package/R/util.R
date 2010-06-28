@@ -94,7 +94,14 @@ getDefaultNameFormat <- function(data) {
               )
     any(values!=values[1])
   }
-  fields <- Filter(hasDifferentValues, c("file", "run", "runnumber", "module", "name", "experiment", "measurement", "replication"))
+  # It is not good this way. A result item can be uniquely identified by the run it was 
+  # generated in (identified in some way), plus the module name and the statistic name.
+  # So (runid, module, name) is always good, although as an alternative to runid, the run 
+  # could be  identified with (configname, runnumber) or (experiment, measurement, replication)
+  # too -- but it should be checked that these tuples uniquely identify the run. --Andras
+  #
+  #fields <- Filter(hasDifferentValues, c("file", "run", "runnumber", "module", "name", "experiment", "measurement", "replication"))
+  fields <- Filter(hasDifferentValues, c("run", "module", "name"))
 
   if (length(fields) > 0)
     do.call(paste, as.list(paste("{", fields, "}", sep="")))

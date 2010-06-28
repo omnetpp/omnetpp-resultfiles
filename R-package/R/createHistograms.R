@@ -25,6 +25,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+#TODO: add a resultNameFormat parameter! --Andras
 createHistograms <- function (dataset) {
   makeHist <- function(key, name) {
       bins <- dataset$bins[dataset$bins$resultkey == key,]
