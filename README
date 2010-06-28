@@ -1,0 +1,8 @@
+This is an umbrella repository for software and documentation related to the OMNeT++ result file format.
+
+Contents:
+ - documentation of the OMNeT++ result file format
+ - Java and C++ libraries for creating result files in this format, with examples
+ - package for GNU R (r-project.org) for reading, processing and plotting result files
+ - downloads contain Scave, a powerful multi-platform integrated GUI for result analysis
+
