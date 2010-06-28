@@ -59,6 +59,9 @@ formatResultItems <- function(data, formatString) {
     )
   }
 
+  # following line is intended to replace "${name}" occurrences with "{name}", so that both syntaxes are understood
+  formatString <- gsub("\\$\\{", "{", formatString)
+
   matches <- gregexpr("(?<!\\\\)\\{([a-zA-Z-]+)\\}", formatString, perl=TRUE)
   starts <- as.vector(matches[[1]])
   ends <- starts + attr(matches[[1]], "match.length") - 1
@@ -85,7 +88,7 @@ formatResultItems <- function(data, formatString) {
 getDefaultNameFormat <- function(data) {
 
   if (nrow(data) <= 1)
-    return("{module} {name}")
+    return("${module} ${name}")
 
   hasDifferentValues <- function(field) {
     values <- switch(field,
@@ -104,9 +107,9 @@ getDefaultNameFormat <- function(data) {
   fields <- Filter(hasDifferentValues, c("run", "module", "name"))
 
   if (length(fields) > 0)
-    do.call(paste, as.list(paste("{", fields, "}", sep="")))
+    do.call(paste, as.list(paste("${", fields, "}", sep="")))
   else
-    "{module} {name} - {index}"
+    "${module} ${name} - ${index}"
 }
 
 getResultItemNames <- function(data, formatString) {

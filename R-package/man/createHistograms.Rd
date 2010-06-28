@@ -34,7 +34,7 @@
 \usage{createHistograms(dataset, nameFormat)}
 \arguments{
     \item{dataset}{an object of class "dataset" with 'statistics', 'fields' and 'bins' components.}
-    \item{nameFormat}{an optional format string for the histogram names, e.g. "{module} {name}".}
+    \item{nameFormat}{an optional format string for the histogram names, e.g. "$\{module\} $\{name\}".}
 }
 
 \details{
