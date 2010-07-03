@@ -1,0 +1,66 @@
+version 2
+run BERDistance-15-20100629-07:59:51-5419
+attr Channel ghassemzadeh-nlos
+attr Receiver 3dB
+attr configname BERDistance
+attr datetime 20100629-07:59:51
+attr distance 8
+attr experiment BERDistance
+attr inifile omnetpp.ini
+attr iterationvars "$distance=8, $nbPackets=250, $Channel=ghassemzadeh-nlos, $Receiver=3dB"
+attr iterationvars2 "$distance=8, $nbPackets=250, $Channel=ghassemzadeh-nlos, $Receiver=3dB, $repetition=0"
+attr measurement "$distance=8, $nbPackets=250, $Channel=ghassemzadeh-nlos, $Receiver=3dB"
+attr nbPackets 250
+attr network ieee802154a
+attr processid 5419
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 15
+attr seedset 15
+
+scalar . 	Receiver 	3
+attr unit  dB
+scalar . 	distance 	8
+scalar . 	nbPackets 	250
+scalar ieee802154a.node[0].batteryStats 	nominal 	1187988120
+attr unit  mW-s
+scalar ieee802154a.node[0].batteryStats 	total 	8639127.9488671
+attr unit  mW-s
+scalar ieee802154a.node[0].batteryStats 	lifetime 	-1
+attr unit  s
+scalar ieee802154a.node[0].batteryStats 	"Mean power consumption" 	99.989906815591
+attr unit  mW
+scalar ieee802154a.node[0].nic.phy 	nbFramesWithInterference 	0
+scalar ieee802154a.node[0].nic.phy 	nbFramesWithoutInterference 	250
+scalar ieee802154a.node[0].nic.phy 	nbRandomBits 	0
+scalar ieee802154a.node[0].nic.phy 	avgThreshold 	0
+scalar ieee802154a.node[0].nic.phy 	nbSuccessfulSyncs 	250
+scalar ieee802154a.node[0].nic.phy 	nbFailedSyncs 	0
+scalar ieee802154a.node[0].nic.phy 	nbCancelReceptions 	0
+scalar ieee802154a.node[0].nic.phy 	nbFinishTrackingFrames 	250
+scalar ieee802154a.node[0].nic.phy 	nbFinishNoiseFrames 	0
+scalar ieee802154a.node[0].nic.mac 	"Erroneous bits" 	10963
+scalar ieee802154a.node[0].nic.mac 	"Total received bits" 	60000
+scalar ieee802154a.node[0].nic.mac 	"Average BER" 	0.18271666666667
+scalar ieee802154a.node[0].nic.mac 	nbReceivedPacketsRS 	73
+scalar ieee802154a.node[0].nic.mac 	nbReceivedPacketsnoRS 	52
+scalar ieee802154a.node[0].nic.mac 	nbReceivedPackets 	73
+scalar ieee802154a.node[0].nic.mac 	nbSentPackets 	0
+scalar ieee802154a.node[1].batteryStats 	nominal 	1187988120
+attr unit  mW-s
+scalar ieee802154a.node[1].batteryStats 	total 	86391.366722584
+attr unit  mW-s
+scalar ieee802154a.node[1].batteryStats 	lifetime 	-1
+attr unit  s
+scalar ieee802154a.node[1].batteryStats 	"Mean power consumption" 	0.99990007780768
+attr unit  mW
+scalar ieee802154a.node[1].nic.phy 	nbFramesWithInterference 	0
+scalar ieee802154a.node[1].nic.phy 	nbFramesWithoutInterference 	0
+scalar ieee802154a.node[1].nic.phy 	nbRandomBits 	0
+scalar ieee802154a.node[1].nic.phy 	avgThreshold 	0
+scalar ieee802154a.node[1].nic.phy 	nbSuccessfulSyncs 	0
+scalar ieee802154a.node[1].nic.phy 	nbFailedSyncs 	0
+scalar ieee802154a.node[1].nic.phy 	nbCancelReceptions 	0
+scalar ieee802154a.node[1].nic.phy 	nbFinishTrackingFrames 	0
+scalar ieee802154a.node[1].nic.phy 	nbFinishNoiseFrames 	0
