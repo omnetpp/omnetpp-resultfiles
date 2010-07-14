@@ -25,11 +25,11 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-add <- function(type, select=NULL) {
+add <- function(type=NULL, select=NULL) {
   list(quote(add), type=type, select=select)
 }
 
-discard <- function(type, select=NULL) {
+discard <- function(type=NULL, select=NULL) {
   list(quote(discard), type=type, select=select)
 }
 
