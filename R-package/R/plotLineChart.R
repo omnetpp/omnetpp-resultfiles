@@ -105,7 +105,7 @@ plotLineChart <- function (data, properties) {
           ylab=getProperty('Y.Axis.Title'))
 
     # legend
-    if (getProperty('Legend.Display', 'true') == 'true') {
+    if (getProperty('Legend.Display', 'false') == 'true') {
       legendPosition  <- getProperty('Legend.Position', 'Inside')
       legendAnchoring <- getProperty('Legend.Anchoring', 'North')
 

@@ -31,7 +31,7 @@ getRunsInWideFormat <- function (runattrs) {
      return(dataframe)
    }
   runattrs <- drop.levels(reshape(runattrs, direction='wide', idvar='runid', timevar='attrname'))
-  names(runattrs) <- sapply(names(runattrs), function (name) sub("^value\\.", "", name) )
+  names(runattrs) <- sapply(names(runattrs), function (name) sub("^attrvalue\\.", "", name) )
   runattrs
 }
 

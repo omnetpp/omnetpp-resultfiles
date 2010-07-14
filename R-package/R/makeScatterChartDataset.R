@@ -31,25 +31,33 @@ makeScatterChartDataset <- function (dataset, xModule, xName, isoModules=charact
 
   # group scalars according to iso scalars/attributes
   groupScalars <- function(scalars) {
-    # remove iso scalars
+    # separate iso scalars
     i1 <- match(scalars$module, isoModules, nomatch=0)
     i2 <- match(scalars$name, isoNames, nomatch=-1)
     isoScalarIndeces <- which(i1 == i2)
     isoScalars <- scalars[isoScalarIndeces,]
-    otherScalars <- if(length(isoScalarIndeces)>0) scalars[-isoScalarIndeces,] else scalars
-
+    scalars <- if(length(isoScalarIndeces)>0) scalars[-isoScalarIndeces,] else scalars 
+    
     # join run attributes and iso scalars
-    # TODO iso scalars
-    scalarsWithRuns <- merge(omnetpp:::getRunsInWideFormat(dataset$runattrs), otherScalars, by='runid')
-
+    isoScalarNames <- paste(isoModules, isoNames)
+    isoScalars <- data.frame(runids=isoScalars$runid, name=paste(isoScalars$module, isoScalars$name), value=isoScalars$value)
+    runAttrs <- getRunsInWideFormat(dataset$runattrs)
+    isoParams <- if (nrow(isoScalars)>0)
+                   merge(runAttrs,
+                         reshape(isoScalars, direction='wide', idvar='runid', timevar='name'),
+                         by='runid')
+                 else
+                   runAttrs 
+    scalars <- merge(isoParams, scalars, by='runid')
+    
     # split according to the values of the iso attributes
-    s <- if (length(isoAttrs)>0)
-           split(scalarsWithRuns, scalarsWithRuns[[isoAttrs]])
-         else
-           list(scalarsWithRuns)
-
+    scalars <- if (length(isoAttrs)>0 || length(isoModules)>0)
+                 split(scalars, scalars[[c(isoAttrs, paste(isoModules, isoNames))]])
+               else
+                 list(scalars)
+    
     if (averageReplications) {
-      lapply(s,
+      lapply(scalars,
              function(data) {
                s <- aggregate(data[,'value'], data[,c('experiment','measurement','module','name')], mean)
                # rename column 'x' to 'value'
@@ -58,7 +66,7 @@ makeScatterChartDataset <- function (dataset, xModule, xName, isoModules=charact
              })
     }
     else {
-      lapply(s, subset, select=c('runid', 'module', 'name', 'value'))
+      lapply(scalars, subset, select=c('runid', 'module', 'name', 'value'))
     }
   }
 
@@ -79,7 +87,7 @@ makeScatterChartDataset <- function (dataset, xModule, xName, isoModules=charact
       lines <- lines[sapply(lines,length) > 0]
       lines
   }
-
+  
   # TODO line names
   #   '<module> <name> - <isoModule> <isoName>=<value> <isoAttr>=<value>'
   do.call(c, lapply(groupScalars(dataset$scalars), sortScalars))
