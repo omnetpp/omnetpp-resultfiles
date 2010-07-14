@@ -25,12 +25,12 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-add <- function(type, select) {
-  as.list(match.call())
+add <- function(type, select=NULL) {
+  list(quote(add), type=type, select=select)
 }
 
-discard <- function(type, select) {
-  as.list(match.call())
+discard <- function(type, select=NULL) {
+  list(quote(discard), type=type, select=select)
 }
 
 loadDataset <- function(files, ...) {
