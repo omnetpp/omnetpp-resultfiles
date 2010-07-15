@@ -45,6 +45,13 @@ getRunsInWideFormat <- function (runattrs) {
   runattrs
 }
 
+addRunAttributes <- function (data, runattrs, attrnames=NULL) {
+  if (!is.null(attrnames))
+    runattrs <- subset(runattrs, attrname %in% attrnames)
+  runattrs <- getRunsInWideFormat(runattrs)
+  merge(data, runattrs, by='runid', all.x=TRUE)
+}
+
 legendAnchoringToPosition <- function(anchoring) {
     switch(anchoring,
       North = 'top',

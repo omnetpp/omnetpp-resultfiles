@@ -26,8 +26,8 @@ plotHistogramChart(histograms, list(X.Axis.Title='number of colliding packets', 
 # Plotting vectors.
 #
 dataset <- loadDataset(vectorFiles, add(select='name("Queue length (packets)")'))
-data <- loadVectors(dataset, NULL)
-plotLineChart(split(data$vectordata, data$vectordata$resultkey), list(X.Axis.Title='simulation time', Y.Axis.Title='queue length'))
+data <- makeLineChartDataset(loadVectors(dataset, NULL), '{configname}/{runnumber} {module}')
+plotLineChart(data, list(X.Axis.Title='simulation time', Y.Axis.Title='queue length', Legend.Display='true'))
 
 #
 # Some bar charts.
