@@ -28,7 +28,7 @@
 #
 # TODO baseline, logarithimic y
 #
-plotBarChart <- function (data, properties) {
+plotBarChart <- function (data, properties, conf.int=NULL) {
     getProperty <- function(propertyName, defaultValue=NULL) {
       if (is.null(properties[[propertyName]])) defaultValue else properties[[propertyName]]
     }
@@ -38,6 +38,8 @@ plotBarChart <- function (data, properties) {
     }
 
     data <- t(data)
+    if (!is.null(conf.int))
+      conf.int <- t(conf.int)
 
     # layout, calculate positions of bars
     cGroups <- ncol(data) # number of groups
@@ -50,7 +52,8 @@ plotBarChart <- function (data, properties) {
     horizontalInset <- 1.0
     baseline <- 0
 
-    bars <- switch(getProperty('Bar.Placement', 'Aligned'),
+    barPlacement <- getProperty('Bar.Placement', 'Aligned')
+    bars <- switch(barPlacement,
       Aligned    = {
                      hgapMinor  <- hgapMinorPct * barWidth
                      groupWidth <- barWidth * cBars + (hgapMinor * (cBars - 1))
@@ -128,6 +131,16 @@ plotBarChart <- function (data, properties) {
     defaultColors <- rainbow(length(barNames))
     barColors <- mapply(function(name, index) getBarProperty('Bar.Color', name, defaultColors[[index]]), barNames, seq_along(barNames))
     rect(bars$l, bars$b, bars$r, bars$t, col=barColors)
+    if (!is.null(conf.int) && barPlacement=='Aligned') {
+      x <- (bars$l+bars$r) / 2
+      w <- (bars$r-bars$l) / 4
+      y0 <- as.vector(data - conf.int)
+      y1 <- as.vector(data + conf.int)
+      #arrows(x, y0, x, y1, angle=90, code=3, col='red')
+      segments(x, y0, x, y1, col='red')
+      segments(x-w, y0, x+w, y0, col='red')
+      segments(x-w, y1, x+w, y1, col='red')
+    }
 
     # plot titles
     title(main=getProperty('Graph.Title', ''),

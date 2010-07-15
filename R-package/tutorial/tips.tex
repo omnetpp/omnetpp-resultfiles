@@ -42,12 +42,11 @@ s <- aggregate(scalars[,'value'],scalars[,c('experiment','measurement','module',
 \section{How to create a bar chart of some scalars where error bars indicate
 confidence interval?}
 
-- barplot() returning bar midpoints + arrows(angle=90,code=3)/segments()
-- barplot2() from gplots package
-- bargraph.CI() from sciplot package
-- plotCI() from plotrix
-
-Why not use boxplot() ?
+\begin{verbatim}
+heigths <- makeBarChartDataset(dataset, rows=c('measurement'), columns=c('name'))
+conf.intervals <- makeBarChartDataset(dataset, rows=c('measurement'), columns=c('name'), conf.int(0.95) )
+plotBarChart(heigths, list(Legend.Display='true', Legend.Anchoring='NorthWest'), conf.int=cond.intervals)
+\end{verbatim}
 
 \section{How to average some scalars across modules?}
 

@@ -25,6 +25,16 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+conf.int <- function(conf.level) {
+  function(v) {
+    n <- length(v)
+    if (n <= 1)
+      Inf
+    else
+      qt(1-(1-conf.level)/2,df=n-1)*sd(v)/sqrt(n)
+  }
+}
+
 getRunsInWideFormat <- function (runattrs) {
    drop.levels <- function(dataframe) {
      dataframe[] <- lapply(dataframe, function(x) x[,drop=TRUE])
