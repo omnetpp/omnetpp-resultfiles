@@ -91,6 +91,10 @@ evalCommands <- function(commands) {
       list("slidingwinavg", windowSize=windowSize)
     }
     
+    substractFirstValue <- function () {
+      list("substractFirstValue")
+    }
+
     sum <- function () {
       list("sum")
     }

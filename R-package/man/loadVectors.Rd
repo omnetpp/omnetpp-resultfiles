@@ -69,6 +69,7 @@
         \code{multiplyBy(a)} \cr
         \code{removerepeats()} \cr
         \code{slidingwinavg(windowSize)} \cr
+        \code{substractFirstValue()} \cr
         \code{sum()} \cr
         \code{timeavg(interpolation-mode)} \cr
         \code{timediff()} \cr

@@ -51,6 +51,7 @@
   multiplyBy(a) \tab Multiplies input by a constant. \cr
   removerepeats() \tab Removes repeated y values. \cr
   slidingwinavg(windowSize) \tab Replaces every value with the mean of values in the window. \cr
+  substractFirstValue() \tab Substract the first value from every subsequent values. \cr
   sum() \tab Sums up values. \cr
   timeavg(interpolationMode) \tab Calculates the time average of the input (integral devided by time) \cr
   timediff() \tab Returns the difference in time between this and the previous value. \cr
