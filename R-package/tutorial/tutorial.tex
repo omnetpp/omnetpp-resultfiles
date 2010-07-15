@@ -799,7 +799,7 @@ Let's begin with loading a vector file:
 loaded wit the \ttt{loadVectors()} function:
 
 \begin{verbatim}
-> v <- loadVectors(x$vectors)
+> v <- loadVectors(x, NULL)
 \end{verbatim}
 
 If you get the error \ttt{indexed vector file reader: index file is not up to date}, then
@@ -899,7 +899,7 @@ The \ttt{loadVectors()} function also supports filtering. For example, the follo
 command applies a \ttt{winavg(10)} filter to the vectors:
 
 \begin{verbatim}
-> loadVectors(x$vectors, apply(winavg(10)))
+> loadVectors(x, NULL, apply(winavg(10)))
 \end{verbatim}
 
 To see the list of available filters, type \ttt{?filters}.

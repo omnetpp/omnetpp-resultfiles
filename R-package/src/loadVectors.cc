@@ -25,6 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+// TODO output resultkeys differ from the input resultkeys; keep them start the keys of computed vectors from a global counter?
+
 #include <iostream>
 #include <map>
 
@@ -187,8 +189,8 @@ static Vectors loadVectors(SEXP vectors, SEXP commands, ResultFileManager &manag
 static const char* datasetColumnNames[] = {"vectors", "vectordata", "attrs"};
 static const int datasetColumnsLength = sizeof(datasetColumnNames) / sizeof(const char*);
 
-static const char* vectorColumnNames[] = {"resultkey", "file", "vectorid", "module", "name"};
-static const SEXPTYPE vectorColumnTypes[] = {INTSXP, STRSXP, INTSXP, STRSXP, STRSXP};
+static const char* vectorColumnNames[] = {"resultkey", "runid", "file", "vectorid", "module", "name"};
+static const SEXPTYPE vectorColumnTypes[] = {INTSXP, STRSXP, STRSXP, INTSXP, STRSXP, STRSXP};
 static const int vectorColumnsLength = sizeof(vectorColumnNames) / sizeof(const char*);
 
 static const char* vectordataColumnNames[] = {"resultkey", "eventno", "x", "y"};
@@ -210,10 +212,11 @@ static SEXP exportVectors(const ResultFileManager &manager, const Vectors &vecs)
     int vectordataCount = 0, attrCount = 0;
     SEXP vectors = createDataFrame(vectorColumnNames, vectorColumnTypes, vectorColumnsLength, vectorCount);
     SEXP resultKey = VECTOR_ELT(vectors, 0);
-    SEXP file = VECTOR_ELT(vectors, 1);
-    SEXP vectorid = VECTOR_ELT(vectors, 2);
-    SEXP module = VECTOR_ELT(vectors, 3);
-    SEXP name = VECTOR_ELT(vectors, 4);
+    SEXP runid = VECTOR_ELT(vectors, 1);
+    SEXP file = VECTOR_ELT(vectors, 2);
+    SEXP vectorid = VECTOR_ELT(vectors, 3);
+    SEXP module = VECTOR_ELT(vectors, 4);
+    SEXP name = VECTOR_ELT(vectors, 5);
     SET_ELEMENT(dataset, 0, vectors);
     UNPROTECT(1); // vectors
     for (int i = 0; i < vectorCount; ++i)
@@ -224,6 +227,7 @@ static SEXP exportVectors(const ResultFileManager &manager, const Vectors &vecs)
         vectordataCount += vecs[i].array->length();
 
         INTEGER(resultKey)[i] = i;
+        SET_STRING_ELT(runid, i, mkChar(vector.fileRunRef->runRef->runName.c_str()));
         SET_STRING_ELT(file, i, mkChar(vector.fileRunRef->fileRef->fileSystemFilePath.c_str()));
         INTEGER(vectorid)[i] = vector.vectorId;
         SET_STRING_ELT(module, i, mkChar(vector.moduleNameRef->c_str()));

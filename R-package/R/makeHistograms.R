@@ -25,7 +25,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-makeHistograms <- function (dataset, nameFormat) {
+makeHistograms <- function (dataset, nameFormat=NULL) {
   makeHist <- function(key, name) {
       bins <- dataset$bins[dataset$bins$resultkey == key,]
       # remove under/overflow bins

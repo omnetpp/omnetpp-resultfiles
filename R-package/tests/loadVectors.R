@@ -27,24 +27,24 @@ ops <- list(quote(add(1)),
             quote(timewinavg(10)),
             quote(winavg(10)))
             
-testApply <- function (vectors, op) {
+testApply <- function (dataset, op) {
   o <- op
-  eval(substitute(loadVectors(vectors, apply(o))))
+  eval(substitute(loadVectors(dataset, NULL, apply(o))))
 }
 
-testCompute <- function (vectors, op) {
+testCompute <- function (dataset, op) {
   o <- op
-  eval(substitute(loadVectors(vectors, compute(o))))
+  eval(substitute(loadVectors(dataset, NULL, compute(o))))
 }
 
 for (op in ops) {
-  print(testApply(dataset$vectors, op))
-  print(testCompute(dataset$vectors, op))
+  print(testApply(dataset, op))
+  print(testCompute(dataset, op))
 }
 
 f <- function () {
     x <- 1
-    print(loadVectors(dataset$vectors, compute(add(x)), apply(mean())))
+    print(loadVectors(dataset, NULL, compute(add(x)), apply(mean())))
 }
 
 f()

@@ -122,8 +122,8 @@ getDefaultNameFormat <- function(data) {
     "${module} ${name} - ${index}"
 }
 
-getResultItemNames <- function(data, formatString) {
-  if (missing(formatString))
+getResultItemNames <- function(data, formatString=NULL) {
+  if (is.null(formatString))
     formatString <- getDefaultNameFormat(data)
   formatResultItems(data, formatString)
 }

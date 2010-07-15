@@ -144,17 +144,19 @@ evalCommands <- function(commands) {
     eval(commands, envir=as.list(environment()), enclos=parent.frame(2))
 }
 
-loadVectors <- function (vectors, ...) {
+loadVectors <- function (dataset, vectorkeys, ...) {
+  vectors <- if (is.null(vectorkeys)) dataset$vectors else subset(dataset$vectors, resultkey %in% vectorkeys)
   vectors$file <- as.character(vectors$file)
   commands <- evalCommands(substitute(list(...)))
 
-  dataset <- .Call('callLoadVectors', vectors, commands)
+  result <- .Call('callLoadVectors', vectors, commands)
 
   structure(
     list(
-      vectors = as.data.frame(dataset$vectors),
-      vectordata = as.data.frame(dataset$vectordata),
-      attrs = as.data.frame(dataset$attrs)
+      runattrs = dataset$runattrs,
+      vectors = as.data.frame(result$vectors),
+      vectordata = as.data.frame(result$vectordata),
+      attrs = as.data.frame(result$attrs)
     ),
     class='omnetpp_dataset'
   )

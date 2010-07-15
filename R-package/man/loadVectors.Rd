@@ -33,14 +33,15 @@
   This function can process huge (GB) result files without loading the whole file into memory.
 }
 
-\usage{loadVectors(vectors, \dots)}
+\usage{loadVectors(dataset, vectorkeys, \dots)}
 \arguments{
-	\item{vectors}{a dataframe with (file,vectorid) columns.}
+	\item{dataset}{an dataset containing the vectors data.}
+	\item{vectorkeys}{the keys of the vectors to be loaded, use NULL to select all vectors.}
     \item{\dots}{The operations describing further processing of the vectors. The arguments are not evaluated.}
 }
 
 \details{
-  The first argument identifies the vectors loaded from the result files.
+  The first two argument identifies the vectors loaded from the result files.
   The other arguments describe the processing steps to by applied to the loaded vectors.
   Each step must be one of the following:
   \tabular{ll}{
@@ -83,8 +84,9 @@
 }
 
 \value{
-  a list with 3 components:
-  \item{vectors}{dataframe of vectors with (resultkey, file, vectorid, module, name) columns, file is '' for computed vectors}
+  a list with 4 components:
+  \item{runattrs}{dataframe of run attributes with (runid, attrname, attrvalue) columns}
+  \item{vectors}{dataframe of vectors with (resultkey, runid, file, vectorid, module, name) columns, file is '' for computed vectors}
   \item{vectordata}{dataframe of vector data with (resultkey, eventno, x, y) columns}
   \item{attrs}{dataframe of attributes of computed vectors with (resultkey, attrname, attrvalue) columns}
 
@@ -98,6 +100,6 @@ d <- loadDataset(c('Aloha.sca', 'PureAloha1-*.vec'),
        add(type='scalar', select='module(Aloha.server)'),
        add('vector'))
 
-loadVectors(d$vectors, compute(winavg(windowSize=10), select='name("channel utilization")'))
+loadVectors(d, NULL, compute(winavg(windowSize=10), select='name("channel utilization")'))
 }
 \keyword{file}
