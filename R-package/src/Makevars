@@ -1,4 +1,4 @@
-PKG_CPPFLAGS = -Iscave -Icommon -Iplatdep
+PKG_CPPFLAGS = -Iscave -Icommon -Iplatdep -DSTRICT_R_HEADERS
 
 COMMON_SOURCES = $(filter-out common/rwlock.cc,$(wildcard common/*.cc))
 SCAVE_SOURCES = $(filter-out scave/octaveexport.cc scave/scavetool.cc,$(wildcard scave/*.cc))
