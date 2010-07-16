@@ -51,18 +51,22 @@ makeScatterChartDataset <- function (dataset, xModule, xName, isoModules=charact
     scalars <- merge(isoParams, scalars, by='runid')
     
     # split according to the values of the iso attributes
-    scalars <- if (length(isoAttrs)>0 || length(isoModules)>0)
-                 split(scalars, scalars[[c(isoAttrs, paste(isoModules, isoNames))]])
+    isoColumns <- c(isoAttrs, paste(isoModules, isoNames))
+    scalars <- if (length(isoColumns)>0 && !is.null(scalars[[isoColumns]])) {
+                   split(scalars, scalars[[isoColumns]])
+                 }
                else
                  list(scalars)
     
     if (averageReplications) {
       lapply(scalars,
              function(data) {
-               s <- aggregate(data[,'value'], data[,c('experiment','measurement','module','name')], mean)
-               # rename column 'x' to 'value'
-               names(s)[names(s)=='x'] <- 'value'
-               s
+               if (nrow(data) > 0) {
+                 data <- aggregate(data[,'value'], data[,c('experiment','measurement','module','name')], mean)
+                 # rename column 'x' to 'value'
+                 names(data)[names(data)=='x'] <- 'value'
+               }
+               data
              })
     }
     else {
@@ -75,7 +79,7 @@ makeScatterChartDataset <- function (dataset, xModule, xName, isoModules=charact
       xScalarIndeces <- which(scalars$module == xModule & scalars$name == xName)
       xScalars <- scalars[xScalarIndeces,]
       otherScalars <- scalars[-xScalarIndeces,]
-      byColumns <- if(averageReplications) c('experiment', 'measurement') else 'runid'
+      byColumns <- if(is.null(scalars$runid)) c('experiment', 'measurement') else 'runid'
       data <- merge(xScalars, otherScalars, by=byColumns)
       lines <- split(data,list(data$module.y,data$name.y))
       lines <- lapply(lines,
