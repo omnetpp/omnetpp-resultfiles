@@ -31,10 +31,10 @@
 \description{
   Plot a line chart.
 }
-\usage{plotLineChart(data, properties)}
+\usage{plotLineChart(data, \dots)}
 \arguments{
     \item{data}{a list of two column matrices, the rows of the matrices are ordered by their first column}
-    \item{properties}{the graphical properties of the chart (like titles, line types, colors, \ldots)}
+    \item{\dots}{the graphical properties of the chart (like titles, line types, colors, \ldots)}
 }
 
 \details{
@@ -60,7 +60,7 @@
 \examples{
 d <- loadDataset(system.file('extdata/PureAloha1-0.vec', package='omnetpp'), add(type='vector'))
 vectors <- loadVectors(d, NULL)
-plotLineChart(split(vectors$vectordata, vectors$vectordata$resultkey), list())
+plotLineChart(split(vectors$vectordata, vectors$vectordata$resultkey))
 }
 
 \keyword{hplot}

@@ -31,10 +31,10 @@
 \description{
   Plots a bar chart.
 }
-\usage{plotBarChart(data, properties)}
+\usage{plotBarChart(data, \dots)}
 \arguments{
     \item{data}{a numeric matrix, where rows are the groups of the bar chart and columns are the bars.}
-    \item{properties}{graphical properties of the chart (like titles, colors, \ldots)}
+    \item{\dots}{graphical properties of the chart (like titles, colors, \ldots)}
 }
 
 \details{
@@ -56,7 +56,7 @@
 \examples{
 d <- loadDataset(system.file('extdata/PureAloha1-0.sca', package='omnetpp'), add('scalar'))
 b <- makeBarChartDataset(d, rows=c('module','experiment','measurement'))
-plotBarChart(b, list(Graph.Title='aloha'))
+plotBarChart(b, Graph.Title='aloha')
 }
 
 \keyword{hplot}

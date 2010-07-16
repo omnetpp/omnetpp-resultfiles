@@ -25,7 +25,9 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-plotLineChart <- function (data, properties) {
+plotLineChart <- function (data, ...) {
+
+    properties <- list(...)
 
     getProperty <- function(propertyName, defaultValue=NULL) {
       if (is.null(properties[[propertyName]])) defaultValue else properties[[propertyName]]

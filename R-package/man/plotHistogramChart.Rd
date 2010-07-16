@@ -31,10 +31,10 @@
 \description{
   Plot one or more histograms.
 }
-\usage{plotHistogramChart(data, properties)}
+\usage{plotHistogramChart(data, \dots)}
 \arguments{
     \item{data}{a list of histogram objects}
-    \item{properties}{a list of graphical properties of the chart (like titles, colors, \ldots)}
+    \item{\dots}{a list of graphical properties of the chart (like titles, colors, \ldots)}
 }
 
 \details{
@@ -65,7 +65,6 @@
 
 \examples{
 data <- list(norm=hist(rnorm(1000), plot=FALSE), unif=hist(runif(1000), plot=FALSE))
-props <- list(Graph.Title='Test', 'Hist.Color/norm'='#000080', 'Hist.Color/unif'='#008000')
-plotHistogramChart(data, props)
+plotHistogramChart(data, Graph.Title='Test', 'Hist.Color/norm'='#000080', 'Hist.Color/unif'='#008000')
 }
 \keyword{hplot}

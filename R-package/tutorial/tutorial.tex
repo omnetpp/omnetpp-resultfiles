@@ -711,7 +711,7 @@ function that extracts the data from scalars in a dataset. An example:
 
 \begin{verbatim}
 > bcd <- makeBarChartDataset(x, rows=c('module'), columns='name')
-> plotBarChart(bcd, list(Legend.Display="true"))
+> plotBarChart(bcd, Legend.Display="true")
 \end{verbatim}
 
 TODO: Refine this section of the tutorial.
@@ -873,7 +873,7 @@ This can be turned into a line chart with the \ttt{plotLineChart()} function:
 
 \begin{verbatim}
 > vs <- split(v$vectordata, v$vectordata$resultkey)
-> plotLineChart(vs, list())
+> plotLineChart(vs)
 \end{verbatim}
 
 The second argument to \ttt{plotLineChart()} is a properties list, it can be used
@@ -882,7 +882,7 @@ values are intended to be as close to the properties used by the IDE's Analysis 
 as possible, to facilitate future interoperability. An example:
 
 \begin{verbatim}
-> plotLineChart(vs, list(X.Axis.Title='t', Y.Axis.Title='value'))
+> plotLineChart(vs, X.Axis.Title='t', Y.Axis.Title='value')
 \end{verbatim}
 
 Otherwise \ttt{plotLineChart()} just calls R's \ttt{plot.new()}, \ttt{plot.window()}, 

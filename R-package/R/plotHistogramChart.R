@@ -25,8 +25,10 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-plotHistogramChart <- function (data, properties) {
+plotHistogramChart <- function (data, ...) {
 
+    properties <- list(...)
+    
     getProperty <- function(propertyName, defaultValue=NULL) {
       if (is.null(properties[[propertyName]])) defaultValue else properties[[propertyName]]
     }

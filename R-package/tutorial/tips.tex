@@ -83,7 +83,7 @@ d <- averageScalarsAcrossReplications(dataset, conf.level=0.95)
 \begin{verbatim}
 heigths <- makeBarChartDataset(dataset, rows=c('measurement'), columns=c('name'))
 conf.intervals <- makeBarChartDataset(dataset, rows=c('measurement'), columns=c('name'), conf.int(0.95) )
-plotBarChart(heigths, list(Legend.Display='true', Legend.Anchoring='NorthWest'), conf.int=conf.intervals)
+plotBarChart(heigths, conf.int=conf.intervals, Legend.Display='true', Legend.Anchoring='NorthWest')
 \end{verbatim}
 
 \section{How to average some scalars across modules?}

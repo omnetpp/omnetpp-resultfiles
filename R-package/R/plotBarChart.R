@@ -28,7 +28,9 @@
 #
 # TODO baseline, logarithimic y
 #
-plotBarChart <- function (data, properties, conf.int=NULL) {
+plotBarChart <- function (data, ..., conf.int=NULL) {
+    properties <- list(...)
+    
     getProperty <- function(propertyName, defaultValue=NULL) {
       if (is.null(properties[[propertyName]])) defaultValue else properties[[propertyName]]
     }
