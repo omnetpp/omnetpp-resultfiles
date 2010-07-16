@@ -52,6 +52,23 @@ addRunAttributes <- function (data, runattrs, attrnames=NULL) {
   merge(data, runattrs, by='runid', all.x=TRUE)
 }
 
+averageScalarsAcrossReplications <- function(dataset, conf.level=NULL) {
+  scalars <- addRunAttributes(dataset$scalars, dataset$runattrs, c('experiment', 'measurement'))
+  values <- scalars[,'value']
+  groupByFields <- c('experiment','measurement','module','name')
+  groups <- scalars[,groupByFields]
+  s <- aggregate(values, groups, mean)
+  names(s)[names(s)=='x'] <- 'value' # rename column 'x' to 'value'
+  if (!is.null(conf.level)) {
+    cis <- aggregate(values, groups, conf.int(conf.level))
+    names(cis)[names(cis)=='x'] <- 'ci.length'
+    s <- merge(s, cis, by=groupByFields)
+  }
+  
+  dataset$scalars <- s
+  dataset
+}
+
 legendAnchoringToPosition <- function(anchoring) {
     switch(anchoring,
       North = 'top',
