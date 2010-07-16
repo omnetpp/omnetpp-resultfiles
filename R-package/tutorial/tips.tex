@@ -111,6 +111,14 @@ functions can be used:
 > lapply(vs, summary)
 \end{verbatim}
 
+Or if you have the \ttt{doBy} package installed:
+
+\begin{verbatim}
+> d <- loadDataset('Aloha.vec', add('vector'))
+> d <- loadVectors(d, NULL)
+> summaryBy(y ~ resultkey, d$vectordata, FUN = list(mean, sd, min, max))
+\end{verbatim}
+
 The current version does not support computing the summary statistics without loading the vectors,
 but it is planned in a future version to do so.
 
