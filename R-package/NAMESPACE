@@ -1,7 +1,6 @@
 useDynLib(omnetpp)
 
-export(loadDataset, add, discard)
-export(loadVectors)
+export(loadDataset, loadVectors)
 export(makeLineChartDataset, makeBarChartDataset, makeHistograms, makeScatterChartDataset)
 export(plotBarChart, plotHistogramChart, plotLineChart)
 export(conf.int, averageScalarsAcrossReplications)

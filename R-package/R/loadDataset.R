@@ -25,17 +25,22 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-add <- function(type=NULL, select=NULL) {
-  list(quote(add), type=type, select=select)
-}
-
-discard <- function(type=NULL, select=NULL) {
-  list(quote(discard), type=type, select=select)
-}
-
 loadDataset <- function(files, ...) {
+  evalCommands <- function(commands) {
+    add <- function(type=NULL, select=NULL) {
+      list(quote(add), type=type, select=select)
+    }
+    
+    discard <- function(type=NULL, select=NULL) {
+      list(quote(discard), type=type, select=select)
+    }
+
+    eval(commands, envir=as.list(environment()), enclos=parent.frame(2))
+  }
+
   files <- unlist(sapply(files, Sys.glob), use.names=FALSE)
-  commands <- list(...)
+  commands <- evalCommands(substitute(list(...)))
+  
   dataset <- .Call('callLoadDataset', files, commands)
 
   if (is.null(dataset))
