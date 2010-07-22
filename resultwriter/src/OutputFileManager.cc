@@ -60,7 +60,7 @@ void OutputFileManager::writeRunHeader(ofstream *out, const string&runID, const 
 void OutputFileManager::writeAttributes(std::ofstream *out, const StringMap *attributes)  ///FIXME StringMap passing...
 {
     const StringMap&::iterator iter;
-    if (&attributes)
+    if (attributes)
     {
         for (iter = attributes->begin(); iter != attributes->end(); ++iter)
         {
