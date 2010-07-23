@@ -33,7 +33,7 @@ If you want to generate a plot from vectors in a dataset, use the \ttt{makeLineC
 the vectors and give the lines sensible names:
 
 \begin{verbatim}
-> vs <- makeLineChartDataset(dataset, '{configname}/{runnumber} - {module} {name}')
+> vs <- makeLineChartDataset(dataset, '\${configname}/\${runnumber} - \${module} \${name}')
 > plotLineChart(vs, Legend.Display='true')
 \end{verbatim}
 
