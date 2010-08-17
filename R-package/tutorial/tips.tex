@@ -72,7 +72,7 @@ The result is a list of histgram objects, the elements are identified by module 
 d <- averageScalarsAcrossReplications(dataset)
 \end{verbatim}
 
-\subsection{How to compute confidence intervals as well?}
+To compute confidence intervals as well:
 
 \begin{verbatim}
 d <- averageScalarsAcrossReplications(dataset, conf.level=0.95)
@@ -164,6 +164,7 @@ functions can be used:
 Or if you have the \ttt{doBy} package installed:
 
 \begin{verbatim}
+> require(doBy)
 > d <- loadDataset('Aloha.vec', add('vector'))
 > d <- loadVectors(d, NULL)
 > summaryBy(y ~ resultkey, d$vectordata, FUN = list(mean, sd, min, max))
@@ -178,13 +179,32 @@ variable (i.e. \$numHosts)?}
 Iteration variables are saved as scalars as well, so you can write:
 
 \begin{verbatim}
-d <- makeScatterChartDataset(dataset, xModule='.', xName='numHosts')
-plotLineChart(d)
+> d <- makeScatterChartDataset(dataset, xModule='.', xName='numHosts')
+> plotLineChart(d)
 \end{verbatim}
 
 \section{How to plot a 3D chart where the X,Y axes are run iteration variables?}
 
-(i.e. \$numHosts, \$transmitPower)
+In this example we create a 3D plot of the \ttt{total receive time} as a function
+of the mean \ttt{iaTime} and \ttt{numOfHosts} from the Aloha simulation.
 
-persp
+First create a data frame containing the values of the scalars for each run:
+ 
+\begin{verbatim}
+> require(reshape)
+> d <- loadDataset('/home/tomi/work/omnetpp-resultfiles/R-package/inst/extdata/PureAlohaExperiment-*.sca')
+> x <- subset(d$scalars, name=='mean', c('runid','value'))
+> y <- subset(d$scalars, name=='numHosts', c('runid', 'value'))
+> z <- subset(d$scalars, name=='total receive time', c('runid','value'))
+> data3d <- rename(merge(merge(x, y, by='runid'), z, by='runid'),
+                   c(value.x='mean', value.y='numHosts', value='total receive time'))
+\end{verbatim}
+
+Now you can use the \ttt{lattice} package to draw a 3D scatter plot (\ttt{cloud()}) or a
+3D surface plot (\ttt{wireframe()}):
+
+\begin{verbatim}
+> require(lattice)
+> cloud(`total receive time` ~ numHosts * mean, data=data3d)
+\end{verbatim}
 
