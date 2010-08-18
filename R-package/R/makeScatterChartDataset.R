@@ -41,7 +41,7 @@ makeScatterChartDataset <- function (dataset, xModule, xName, isoModules=charact
     # join run attributes and iso scalars
     isoScalarNames <- paste(isoModules, isoNames)
     isoScalars <- data.frame(runids=isoScalars$runid, name=paste(isoScalars$module, isoScalars$name), value=isoScalars$value)
-    runAttrs <- getRunsInWideFormat(dataset$runattrs)
+    runAttrs <- cast(dataset$runattrs, runid~attrname, value='attrvalue')
     isoParams <- if (nrow(isoScalars)>0)
                    merge(runAttrs,
                          reshape(isoScalars, direction='wide', idvar='runid', timevar='name'),

@@ -4,7 +4,7 @@ Date: 2010-07-22
 Title: Functions for processing OMNeT++ result files
 Author: OpenSim Ltd.
 Maintainer: <r@omnetpp.org>
-Depends: R (>= 2.9.0)
+Depends: R (>= 2.9.0), reshape
 Description: Functions for loading, filtering, preprocessing and plotting
              the data stored in OMNeT++ result files.
 License: BSD

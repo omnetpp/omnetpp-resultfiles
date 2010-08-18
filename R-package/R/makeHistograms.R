@@ -65,7 +65,7 @@ makeHistograms <- function (dataset, nameFormat=NULL) {
 
   }
 
-  data <- merge(getRunsInWideFormat(dataset$runattrs),
+  data <- merge(cast(dataset$runattrs, runid~attrname, value='attrvalue'),
                 subset(dataset$statistics, resultkey %in% dataset$bins$resultkey),
                 by='runid')
 

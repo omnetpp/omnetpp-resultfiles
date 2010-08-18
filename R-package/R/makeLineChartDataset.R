@@ -26,7 +26,10 @@
 #
 
 makeLineChartDataset <- function (dataset, nameFormat=NULL) {
-  data <- addRunAttributes(dataset$vectors, dataset$runattrs)
+  data <- merge(dataset$vectors,
+                cast(dataset$runattrs, runid~attrname, value='attrvalue'),
+                by='runid',
+                all.x=TRUE) 
   lineNames <- getResultItemNames(data, nameFormat)
   lines <- lapply(seq_along(lineNames),
                   function (i) {

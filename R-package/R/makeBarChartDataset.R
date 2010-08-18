@@ -26,8 +26,8 @@
 #
 
 makeBarChartDataset <- function (dataset, rows, columns, aggregate='mean') {
-  runattrs <- getRunsInWideFormat(dataset$runattrs)
-  scalars <- merge(runattrs, dataset$scalars)
+  runattrs <- cast(dataset$runattrs, runid~attrname, value='attrvalue')
+  scalars <- merge(runattrs, dataset$scalars, by='runid')
   rowNames = apply(scalars[rows], 1, paste, collapse='.')
   columnNames = apply(scalars[columns], 1, paste, collapse='.')
   tapply(scalars$value, list(rowNames,columnNames), aggregate)

@@ -35,40 +35,6 @@ conf.int <- function(conf.level) {
   }
 }
 
-getRunsInWideFormat <- function (runattrs) {
-   drop.levels <- function(dataframe) {
-     dataframe[] <- lapply(dataframe, function(x) x[,drop=TRUE])
-     return(dataframe)
-   }
-  runattrs <- drop.levels(reshape(runattrs, direction='wide', idvar='runid', timevar='attrname'))
-  names(runattrs) <- sapply(names(runattrs), function (name) sub("^attrvalue\\.", "", name) )
-  runattrs
-}
-
-addRunAttributes <- function (data, runattrs, attrnames=NULL) {
-  if (!is.null(attrnames))
-    runattrs <- subset(runattrs, attrname %in% attrnames)
-  runattrs <- getRunsInWideFormat(runattrs)
-  merge(data, runattrs, by='runid', all.x=TRUE)
-}
-
-averageScalarsAcrossReplications <- function(dataset, conf.level=NULL) {
-  scalars <- addRunAttributes(dataset$scalars, dataset$runattrs, c('experiment', 'measurement'))
-  values <- scalars[,'value']
-  groupByFields <- c('experiment','measurement','module','name')
-  groups <- scalars[,groupByFields]
-  s <- aggregate(values, groups, mean)
-  names(s)[names(s)=='x'] <- 'value' # rename column 'x' to 'value'
-  if (!is.null(conf.level)) {
-    cis <- aggregate(values, groups, conf.int(conf.level))
-    names(cis)[names(cis)=='x'] <- 'ci.length'
-    s <- merge(s, cis, by=groupByFields)
-  }
-  
-  dataset$scalars <- s
-  dataset
-}
-
 legendAnchoringToPosition <- function(anchoring) {
     switch(anchoring,
       North = 'top',
