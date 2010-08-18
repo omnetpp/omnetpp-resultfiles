@@ -66,16 +66,44 @@ The result is a list of histgram objects, the elements are identified by module 
 
 \section{How to plot a histogram together with its cumulative distribution function?}
 
-\section{How to transform a dataset into another dataset where all scalars are averaged across replications?}
+TODO
+
+\section{How to transform the run attributes into 'wide' format (one column/attribute)?}
+
+Use the \ttt{cast} function from the \ttt{reshape} package:
 
 \begin{verbatim}
-> d <- averageScalarsAcrossReplications(dataset)
+> cast(d$runattrs, runid~attrname, value='attrvalue')
+\end{verbatim}
+
+If you want to restrict the attribute columns:
+
+\begin{verbatim}
+> cast(d$runattrs, runid~attrname, value='attrvalue', subset=attrname %in% c('experiment','measurement','replication'))
+\end{verbatim}
+
+\section{How to transform a dataset into another dataset where all scalars are averaged across replications?}
+
+First add the \ttt{experiment} and \ttt{measurement} columns to the scalars:
+
+\begin{verbatim}
+> scalars <- merge(d$scalars,
+                   cast(d$runattrs, runid~attrname, value='attrvalue', subset=attrname %in% c('experiment','measurement')),
+                   by='runid',
+                   all.x=TRUE)
+\end{verbatim}
+
+Now you can compute the averages by calling \ttt{cast()} again:
+
+\begin{verbatim}
+> cast(scalars, experiment+measurement+module+name ~ ., mean)
 \end{verbatim}
 
 To compute confidence intervals as well:
 
 \begin{verbatim}
-> d <- averageScalarsAcrossReplications(dataset, conf.level=0.95)
+> ci95 <- conf.int(0.95)
+> cast(scalars, experiment+measurement+module+name ~ ., c(mean,ci95))
 \end{verbatim}
 
 \section{How to create a bar chart of some scalars where error bars indicate confidence interval?}
