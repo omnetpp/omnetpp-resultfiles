@@ -16,12 +16,12 @@ $txt =~ s|>|&gt;|sg;
 $txt =~ s|\\begin{verbatim}|<pre>|sg;
 $txt =~ s|\\end{verbatim}|</pre>|sg;
 
+# convert monospace font
+$txt =~ s|\\ttt\{(.*?)\}|<tt>$1</tt>|sg;
+
 # convert section headers
 $txt =~ s|\\section\{(.*?)\}|<h1>$1</h1>|sg;
 $txt =~ s|\\subsection\{(.*?)\}|<h2>$1</h2>|sg;
-
-# convert monospace font
-$txt =~ s|\\ttt\{(.*?)\}|<tt>$1</tt>|sg;
 
 # add <p> (but not inside <pre> tags)
 $i = 0;

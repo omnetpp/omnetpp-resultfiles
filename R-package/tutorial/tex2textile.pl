@@ -24,12 +24,12 @@ $txt =~ s|\\begin{verbatim}\n*(.*?)\n?\\end{verbatim}|$pre{++$i}=$1;"#PRE".$i."#
 $txt =~ s/([^\n])\n([^\n])/$1 $2/sg;
 $txt =~ s/\n\n([^\n])/\n\np. $1/sg;
 
+# convert monospace font
+$txt =~ s/\\ttt\{(.*?[^\\])\}/\@$1@/sg;
+
 # convert section headings
 $txt =~ s/p\. +\\section\{(.*?)\}/h1. $1/sg;
 $txt =~ s/p\. +\\subsection\{(.*?)\}/h2. $1/sg;
-
-# convert monospace font
-$txt =~ s/\\ttt\{(.*?[^\\])\}/\@$1@/sg;
 
 # restore verbatim regions
 $txt =~ s/p\. *#PRE([0-9]+)#/"bc.. " . $pre{$1}/sge;
