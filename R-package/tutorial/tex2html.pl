@@ -19,6 +19,9 @@ $txt =~ s|\\end{verbatim}|</pre>|sg;
 # convert monospace font
 $txt =~ s|\\ttt\{(.*?)\}|<tt>$1</tt>|sg;
 
+# convert image
+$txt =~ s|\\image\{(.*?)\}|<img src="$1">|sg;
+
 # convert section headers
 $txt =~ s|\\section\{(.*?)\}|<h1>$1</h1>|sg;
 $txt =~ s|\\subsection\{(.*?)\}|<h2>$1</h2>|sg;

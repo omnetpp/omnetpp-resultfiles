@@ -27,6 +27,9 @@ $txt =~ s/\n\n([^\n])/\n\np. $1/sg;
 # convert monospace font
 $txt =~ s/\\ttt\{(.*?[^\\])\}/\@$1@/sg;
 
+# convert image
+$txt =~ s|\\image\{(.*?)\}|!$1!|sg;
+
 # convert section headings
 $txt =~ s/p\. +\\section\{(.*?)\}/h1. $1/sg;
 $txt =~ s/p\. +\\subsection\{(.*?)\}/h2. $1/sg;
