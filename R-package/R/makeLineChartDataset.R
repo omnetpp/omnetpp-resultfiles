@@ -33,9 +33,7 @@ makeLineChartDataset <- function (dataset, nameFormat=NULL) {
   lineNames <- getResultItemNames(data, nameFormat)
   lines <- lapply(seq_along(lineNames),
                   function (i) {
-                    name <- lineNames[i]
-                    key  <- data$resultkey[i]
-                    subset(dataset$vectordata, resultkey == key, select=c('x','y'))
+                    subset(dataset$vectordata, resultkey == data$resultkey[i], select=c('x','y'))
                   })
   names(lines) <- lineNames
   lines
