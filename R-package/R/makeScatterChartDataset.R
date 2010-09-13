@@ -62,9 +62,8 @@ makeScatterChartDataset <- function (dataset, xModule, xName, isoModules=charact
       lapply(scalars,
              function(data) {
                if (nrow(data) > 0) {
-                 data <- aggregate(data[,'value'], data[,c('experiment','measurement','module','name')], mean)
-                 # rename column 'x' to 'value'
-                 names(data)[names(data)=='x'] <- 'value'
+                 data <- rename(aggregate(data[,'value'], data[,c('experiment','measurement','module','name')], mean),
+                                c(x='value'))
                }
                data
              })
