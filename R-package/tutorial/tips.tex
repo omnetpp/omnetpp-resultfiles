@@ -1,15 +1,53 @@
-\section{How to transform the run attributes into 'wide' format (one column/attribute)?}
+\section{How to transform the run attributes into 'wide' format?}
 
-Use the \ttt{cast} function from the \ttt{reshape} package:
+The omnetpp dataset contains the run attributes in 'long' format:
+
+\begin{verbatim}
+> d$runattrs
+                                          runid       attrname                            attrvalue
+1 PureAlohaExperiment-0-20090220-15:51:12-31531     configname                  PureAlohaExperiment
+2 PureAlohaExperiment-0-20090220-15:51:12-31531       datetime                    20090220-15:51:12
+3 PureAlohaExperiment-0-20090220-15:51:12-31531     experiment                  PureAlohaExperiment
+4 PureAlohaExperiment-0-20090220-15:51:12-31531        inifile                          omnetpp.ini
+5 PureAlohaExperiment-0-20090220-15:51:12-31531  iterationvars                $numHosts=10, $mean=1
+6 PureAlohaExperiment-0-20090220-15:51:12-31531 iterationvars2 $numHosts=10, $mean=1, $repetition=0
+...
+\end{verbatim}
+
+If you want to transform this into a 'wide' format (one column per attribute),
+you can use the \ttt{cast} function from the \ttt{reshape} package:
 
 \begin{verbatim}
 > cast(d$runattrs, runid~attrname, value='attrvalue')
+                                           runid          configname          datetime          experiment     inifile         iterationvars                       iterationvars2 mean
+1  PureAlohaExperiment-0-20090220-15:51:12-31531 PureAlohaExperiment 20090220-15:51:12 PureAlohaExperiment omnetpp.ini $numHosts=10, $mean=1 $numHosts=10, $mean=1, $repetition=0    1
+2 PureAlohaExperiment-10-20090220-15:51:14-31542 PureAlohaExperiment 20090220-15:51:14 PureAlohaExperiment omnetpp.ini $numHosts=10, $mean=7 $numHosts=10, $mean=7, $repetition=0    7
+3 PureAlohaExperiment-11-20090220-15:51:14-31543 PureAlohaExperiment 20090220-15:51:14 PureAlohaExperiment omnetpp.ini $numHosts=10, $mean=7 $numHosts=10, $mean=7, $repetition=1    7
+4  PureAlohaExperiment-1-20090220-15:51:12-31532 PureAlohaExperiment 20090220-15:51:12 PureAlohaExperiment omnetpp.ini $numHosts=10, $mean=1 $numHosts=10, $mean=1, $repetition=1    1
+5 PureAlohaExperiment-12-20090220-15:51:14-31544 PureAlohaExperiment 20090220-15:51:14 PureAlohaExperiment omnetpp.ini $numHosts=10, $mean=9 $numHosts=10, $mean=9, $repetition=0    9
+6 PureAlohaExperiment-13-20090220-15:51:14-31545 PureAlohaExperiment 20090220-15:51:14 PureAlohaExperiment omnetpp.ini $numHosts=10, $mean=9 $numHosts=10, $mean=9, $repetition=1    9
+            measurement network numHosts processid repetition replication resultdir runnumber seedset
+1 $numHosts=10, $mean=1   Aloha       10     31531          0          #0   results         0       0
+2 $numHosts=10, $mean=7   Aloha       10     31542          0          #0   results        10      10
+3 $numHosts=10, $mean=7   Aloha       10     31543          1          #1   results        11      11
+4 $numHosts=10, $mean=1   Aloha       10     31532          1          #1   results         1       1
+5 $numHosts=10, $mean=9   Aloha       10     31544          0          #0   results        12      12
+6 $numHosts=10, $mean=9   Aloha       10     31545          1          #1   results        13      13
+...
 \end{verbatim}
 
 If you want to restrict the attribute columns:
 
 \begin{verbatim}
 > cast(d$runattrs, runid~attrname, value='attrvalue', subset=attrname %in% c('experiment','measurement','replication'))
+                                           runid          experiment           measurement replication
+1  PureAlohaExperiment-0-20090220-15:51:12-31531 PureAlohaExperiment $numHosts=10, $mean=1          #0
+2 PureAlohaExperiment-10-20090220-15:51:14-31542 PureAlohaExperiment $numHosts=10, $mean=7          #0
+3 PureAlohaExperiment-11-20090220-15:51:14-31543 PureAlohaExperiment $numHosts=10, $mean=7          #1
+4  PureAlohaExperiment-1-20090220-15:51:12-31532 PureAlohaExperiment $numHosts=10, $mean=1          #1
+5 PureAlohaExperiment-12-20090220-15:51:14-31544 PureAlohaExperiment $numHosts=10, $mean=9          #0
+6 PureAlohaExperiment-13-20090220-15:51:14-31545 PureAlohaExperiment $numHosts=10, $mean=9          #1
+...
 \end{verbatim}
 
 \section{How to transform a dataset into another dataset where all scalars are averaged across replications?}
