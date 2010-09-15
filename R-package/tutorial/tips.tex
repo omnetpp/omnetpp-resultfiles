@@ -134,7 +134,6 @@ To sum the drop counts for each node:
 4 Net60-0-20100816-10:48:41-7648 /home/tomi/work/omnetpp/samples/routing/results/Net60-0.sca Net60.rte[11] drop:count     0
 5 Net60-0-20100816-10:48:41-7648 /home/tomi/work/omnetpp/samples/routing/results/Net60-0.sca Net60.rte[12] drop:count     0
 6 Net60-0-20100816-10:48:41-7648 /home/tomi/work/omnetpp/samples/routing/results/Net60-0.sca Net60.rte[13] drop:count     0
-
 \end{verbatim}
 
 If you want to add these scalars to the original dataset, first generate \ttt{resultkey} for the new scalars,
@@ -207,8 +206,12 @@ If \ttt{v} a matrix or data frame with \ttt{x} and \ttt{y} columns, you can draw
 Another possibility is to use the \ttt{xyplot} function from the \ttt{lattice} package:
 
 \begin{verbatim}
+> require(lattice)
 > xyplot(y~x, d$vectordata, subset=resultkey==2, type='l')
 \end{verbatim}
+
+\image{http://github.com/omnetpp/omnetpp-resultfiles/raw/tomi/R-package/tutorial/figures/tips/vector.png}
+
 
 \section{How to plot several vectors?}
 
@@ -243,6 +246,7 @@ the vectors and give the lines sensible names:
 \subsection{Using the \ttt{lattice} package}
 
 \begin{verbatim}
+> require(lattice)
 > xyplot(y~x, d$vectordata, groups=resultkey)
 \end{verbatim}
 
