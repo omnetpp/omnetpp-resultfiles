@@ -76,11 +76,16 @@ To compute confidence intervals as well:
 
 \section{How to average some scalars across modules?}
 
-For example, if you want the average of \ttt{'avgQueueLength'} across all queue modules:
+For example, if you want the average of \ttt{'avgQueueLength'} across all queue modules per run:
 
 \begin{verbatim}
-> ql <- subset(d$scalars, grepl('.*\\.queue', module) & name='avgQueueLength')
-> mean(ql$value)
+> cast(d$scalars, runid~name, mean, subset=grepl('.*\\.queue', module) & name=='avgQueueLength')
+\end{verbatim}
+
+If you want to average for the runs too:
+
+\begin{verbatim}
+> cast(d$scalars, .~name, mean, subset=grepl('.*\\.queue', module) & name=='avgQueueLength')
 \end{verbatim}
 
 \section{How to sum scalars grouped by modules?}
