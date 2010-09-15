@@ -35,6 +35,10 @@ conf.int <- function(conf.level) {
   }
 }
 
+nextResultKey <- function(dataset) {
+  max(d$scalars$resultkey, d$vectors$resultkey, d$histograms$resultkey) + 1
+}
+
 legendAnchoringToPosition <- function(anchoring) {
     switch(anchoring,
       North = 'top',
