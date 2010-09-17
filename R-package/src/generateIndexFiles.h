@@ -25,33 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <R.h>
-#include <Rdefines.h>
-#include <R_ext/Rdynload.h>
+#ifndef _GENERATE_INDEX_FILES_H_
+#define _GENERATE_INDEX_FILES_H_
 
-#include "loadDataset.h"
-#include "loadVectors.h"
-#include "generateIndexFiles.h"
+#include <R.h>
 
 extern "C" {
 
-/*
-R_CMethodDef cMethods[] = {
-        {"cLoadDataset", (DL_FUNC)&cLoadDataset, 2, {STRSXP, INTSXP}},
-        {NULL, NULL, 0}
-};
-*/
-
-R_CallMethodDef callMethods[] = {
-        {"callLoadDataset", (DL_FUNC)&callLoadDataset, 2},
-        {"callLoadVectors", (DL_FUNC)&callLoadVectors, 2},
-        {"callGenerateIndexFiles", (DL_FUNC)&callGenerateIndexFiles, 2},
-        {NULL, NULL, 0}
-};
-
-void R_init_omnetpp(DllInfo *info)
-{
-    R_registerRoutines(info, NULL, callMethods, NULL, NULL);
-}
+SEXP callGenerateIndexFiles(SEXP vectorFile, SEXP rebuild);
 
 }
+
+#endif

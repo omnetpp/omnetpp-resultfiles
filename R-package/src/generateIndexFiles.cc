@@ -27,31 +27,38 @@
 
 #include <R.h>
 #include <Rdefines.h>
-#include <R_ext/Rdynload.h>
+#include <Rinternals.h>
 
-#include "loadDataset.h"
-#include "loadVectors.h"
+#include "vectorfileindexer.h"
 #include "generateIndexFiles.h"
+
 
 extern "C" {
 
-/*
-R_CMethodDef cMethods[] = {
-        {"cLoadDataset", (DL_FUNC)&cLoadDataset, 2, {STRSXP, INTSXP}},
-        {NULL, NULL, 0}
-};
-*/
-
-R_CallMethodDef callMethods[] = {
-        {"callLoadDataset", (DL_FUNC)&callLoadDataset, 2},
-        {"callLoadVectors", (DL_FUNC)&callLoadVectors, 2},
-        {"callGenerateIndexFiles", (DL_FUNC)&callGenerateIndexFiles, 2},
-        {NULL, NULL, 0}
-};
-
-void R_init_omnetpp(DllInfo *info)
+SEXP callGenerateIndexFiles(SEXP vectorFiles, SEXP rebuild)
 {
-    R_registerRoutines(info, NULL, callMethods, NULL, NULL);
+    try
+    {
+        VectorFileIndexer indexer;
+        int nVectors = GET_LENGTH(vectorFiles);
+        int needsRebuild = LOGICAL_VALUE(rebuild);
+
+        for (int i=0; i < nVectors; ++i)
+        {
+            const char * file = CHAR(STRING_ELT(vectorFiles, i));
+            if (needsRebuild==TRUE)
+                indexer.rebuildVectorFile(file);
+            else
+                indexer.generateIndex(file);
+        }
+
+        return R_NilValue;
+    }
+    catch (opp_runtime_error &e)
+    {
+        error("Error in callGenerateIndexFiles: %s\n", e.what());
+        return R_NilValue;
+    }
 }
 
-}
+} // extern "C"
