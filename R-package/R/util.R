@@ -39,6 +39,60 @@ nextResultKey <- function(dataset) {
   max(d$scalars$resultkey, d$vectors$resultkey, d$histograms$resultkey) + 1
 }
 
+summary.omnetpp_dataset <- function(object, ...) {
+    d <- object
+    structure(list(runs=levels(d$runattrs$runid),
+                   configs=unique(as.character(d$runattrs[d$runattrs$attrname=='configname', 'attrvalue'])),
+                   modules=sort(unique(c(as.character(d$scalars$module),as.character(d$vectors$module),as.character(d$statistics$module)))),
+                   nscalars=ifelse(is.null(d$scalars), 0, nrow(d$scalars)),
+                   scalars=sort(unique(as.character(d$scalars$name))),
+                   nvectors=ifelse(is.null(d$vectors), 0, nrow(d$vectors)),
+                   vectors=sort(unique(as.character(d$vectors$name))),
+                   nstatistics=ifelse(is.null(d$statistics), 0, nrow(d$statistics)),
+                   statistics=sort(unique(as.character(d$statistics$name)))
+                  ),
+                  class='omnetpp_dataset_summary')
+}
+
+print.omnetpp_dataset_summary <- function(x, ...) {
+    catVertical <- function(v, indent) {
+      for (i in 1:length(v)) {
+        for (j in 1:indent) cat(" ")
+        cat(v[i],"\n")
+      }
+    }
+    
+    with(x,
+      {
+         cat("OMNeT++ dataset containing", nscalars, "scalars,", nvectors, "vectors, and", nstatistics, "statistics")
+         cat(" of", length(modules), "modules from", length(runs), "runs of", length(configs), "configurations.\n")
+         if (length(configs)) {
+           cat("  configurations:\n")
+           catVertical(configs, 4)
+         }
+         if (length(runs)) {
+           cat("  runs:\n")
+           catVertical(runs, 4)
+         }
+         if (length(modules)) {
+           cat("  modules:\n")
+           catVertical(modules, 4)
+         }
+         if (length(scalars)) {
+           cat("  scalars:\n")
+           catVertical(scalars, 4)
+         }
+         if (length(vectors)) {
+           cat("  vectors:\n")
+           catVertical(vectors, 4)
+         }
+         if (length(statistics)) {
+           cat("  statistics:\n")
+           catVertical(statistics, 4)
+         }
+      })
+}
+
 legendAnchoringToPosition <- function(anchoring) {
     switch(anchoring,
       North = 'top',
