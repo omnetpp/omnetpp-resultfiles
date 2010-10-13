@@ -27,71 +27,51 @@
 
 # input:  scalars, xdata, iso params, average-replications
 # output: list of two column matrices (x,y), elements named by series key
-makeScatterChartDataset <- function (dataset, xModule, xName, isoModules=character(0), isoNames=character(0), isoAttrs=character(0), averageReplications=FALSE) {
+makeScatterChartDataset <- function (dataset, xScalar, isoScalars=list(), isoAttrs=character(0), averageReplications=FALSE) {
 
   # group scalars according to iso scalars/attributes
   groupScalars <- function(scalars) {
-    # separate iso scalars
-    i1 <- match(scalars$module, isoModules, nomatch=0)
-    i2 <- match(scalars$name, isoNames, nomatch=-1)
-    isoScalarIndeces <- which(i1 == i2)
-    isoScalars <- scalars[isoScalarIndeces,]
-    scalars <- if(length(isoScalarIndeces)>0) scalars[-isoScalarIndeces,] else scalars 
+    isoParams <- c(isoAttrs, paste(isoScalars$module, isoScalars$name))
+    if (is.null(isoParams) || length(isoParams) == 0)
+      return (list(scalars))
+      
+    # join run attributes and iso scalars with non-iso scalars
+    isIsoScalar <- match(scalars$module, isoScalars$module, nomatch=0) ==
+                   match(scalars$name, isoScalars$name, nomatch=-1)
+    isoValues <- merge(cast(dataset$runattrs, runid~attrname, value='attrvalue'),
+                       cast(transform(scalars[isIsoScalar,], resultkey=NULL, file=NULL, module=NULL, name=paste(module,name)), runid~name),
+                       by='runid', all=TRUE)
+    scalars <- merge(scalars[!isIsoScalar,], isoValues, by='runid')
+                     
+    if (length(setdiff(isoParams, colnames(scalars)))>0)
+      return (list(scalars))
     
-    # join run attributes and iso scalars
-    isoScalarNames <- paste(isoModules, isoNames)
-    isoScalars <- data.frame(runids=isoScalars$runid, name=paste(isoScalars$module, isoScalars$name), value=isoScalars$value)
-    runAttrs <- cast(dataset$runattrs, runid~attrname, value='attrvalue')
-    isoParams <- if (nrow(isoScalars)>0)
-                   merge(runAttrs,
-                         reshape(isoScalars, direction='wide', idvar='runid', timevar='name'),
-                         by='runid')
-                 else
-                   runAttrs 
-    scalars <- merge(isoParams, scalars, by='runid')
-    
-    # split according to the values of the iso attributes
-    isoColumns <- c(isoAttrs, paste(isoModules, isoNames))
-    scalars <- if (length(isoColumns)>0 && !is.null(scalars[[isoColumns]])) {
-                   split(scalars, scalars[[isoColumns]])
-                 }
-               else
-                 list(scalars)
-    
-    if (averageReplications) {
-      lapply(scalars,
-             function(data) {
-               if (nrow(data) > 0) {
-                 data <- rename(aggregate(data[,'value'], data[,c('experiment','measurement','module','name')], mean),
-                                c(x='value'))
-               }
-               data
-             })
-    }
-    else {
-      lapply(scalars, subset, select=c('runid', 'module', 'name', 'value'))
-    }
+    # split according to the iso values
+    split(scalars, scalars[[isoParams]], drop=TRUE)
   }
+  
+  # average replications if needed
+  averageScalars <- if (averageReplications)
+                      function(scalars) rename(cast(scalars, experiment+measurement+module+name~., mean), c('(all)'='value'))
+                    else
+                      function(scalars) subset(scalars, select=c('runid', 'module', 'name', 'value'))
 
   # sort one group of scalars
   sortScalars <- function(scalars) {
-      xScalarIndeces <- which(scalars$module == xModule & scalars$name == xName)
-      xScalars <- scalars[xScalarIndeces,]
-      otherScalars <- scalars[-xScalarIndeces,]
-      byColumns <- if(is.null(scalars$runid)) c('experiment', 'measurement') else 'runid'
-      data <- merge(xScalars, otherScalars, by=byColumns)
-      lines <- split(data,list(data$module.y,data$name.y))
-      lines <- lapply(lines,
-              function(line) {
-                  m <- as.matrix(line[c('value.x','value.y')])
-                  colnames(m) <- c('x','y')
-                  m[order(m[,1]),]
-              })
+      isXScalar <- scalars$module == xScalar$module & scalars$name == xScalar$name
+      xScalars <- scalars[isXScalar,]
+      yScalars <- scalars[!isXScalar,]
+      runId <- if(averageReplications) c('experiment', 'measurement') else 'runid'
+      lines <- dlply(yScalars, ~module+name,
+                     function(yScalars) {
+                       d <- merge(xScalars, yScalars, by=runId)[c('value.x','value.y')]
+                       as.matrix(arrange(rename(d, c(value.x='x', value.y='y')), x))
+                     })
       lines <- lines[sapply(lines,length) > 0]
       lines
   }
   
   # TODO line names
   #   '<module> <name> - <isoModule> <isoName>=<value> <isoAttr>=<value>'
-  do.call(c, lapply(groupScalars(dataset$scalars), sortScalars))
+  do.call(c, lapply(lapply(groupScalars(dataset$scalars), averageScalars), sortScalars))
 }

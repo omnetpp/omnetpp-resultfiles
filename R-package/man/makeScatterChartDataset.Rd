@@ -32,14 +32,12 @@
   Arranges scalars into an XY grid and optionally averages scalars from different
   replications of the same measurement.
 }
-\usage{makeScatterChartDataset(dataset, xModule, xName, isoModules, isoNames,
-                                 isoAttrs, averageReplications=FALSE)}
+\usage{makeScatterChartDataset(dataset, xScalar, isoScalars,
+                               isoAttrs, averageReplications=FALSE)}
 \arguments{
     \item{dataset}{Object of class "dataset", holding the scalars and runs.}
-    \item{xModule}{module name of the scalar on the X axis}
-    \item{xName}{name of the scalar on the X axis}
-    \item{isoModules}{module names of the scalars of the iso lines}
-    \item{isoNames}{names of the scalars of the iso lines}
+    \item{xScalar}{list with 'module' and 'name' components identifying the scalar on the X axis}
+    \item{isoScalars}{list with 'module' and 'name' components identifying the scalars of the iso lines}
     \item{isoAttrs}{names of iso run attributes}
     \item{averageReplications}{if TRUE then scalars from runs of the same measurement are averaged.}
 }
@@ -50,9 +48,10 @@
 }
 
 \examples{
-d <- loadDataset('Aloha.sca', add(type='scalar'))
-makeScatterChartDataset(d, xModule='.', xName='iaTime', isoModules='.',
-                          isoNames='numHosts', averageReplications=TRUE)
+d <- loadDataset(file.path(system.file('extdata',package='omnetpp'),'PureAlohaExperiment*.sca'))
+makeScatterChartDataset(d, xScalar=list(module='.', name='mean'),
+                        isoScalars=list(module='.', name='numHosts'),
+                        averageReplications=TRUE)
 }
 
 \keyword{manip}
