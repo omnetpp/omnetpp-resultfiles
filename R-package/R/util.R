@@ -36,7 +36,9 @@ conf.int <- function(conf.level) {
 }
 
 nextResultKey <- function(dataset) {
-  max(d$scalars$resultkey, d$vectors$resultkey, d$histograms$resultkey) + 1
+  max(dataset$scalars$resultkey,
+      dataset$vectors$resultkey,
+      dataset$histograms$resultkey) + 1
 }
 
 summary.omnetpp_dataset <- function(object, ...) {
