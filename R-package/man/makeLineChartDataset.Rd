@@ -46,8 +46,8 @@
 }
 
 \examples{
-d <- loadDataset('Aloha.vec', add(type='vector'))
-v <- loadVectors(d, NULL)
+data(aloha)
+v <- loadVectors(aloha, NULL)
 
 makeLineChartDataset(v, '{module} {name}')
 }

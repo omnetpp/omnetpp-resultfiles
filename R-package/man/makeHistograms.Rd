@@ -60,8 +60,8 @@
 \seealso{\code{\link{loadDataset}}, \code{\link{hist}}}
 
 \examples{
-data <- loadDataset('queue.sca', add('statistic'))
-hists <- makeHistograms(data)
+data(aloha)
+hists <- makeHistograms(aloha)
 }
 
 \keyword{manip}

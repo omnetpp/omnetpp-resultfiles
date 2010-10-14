@@ -48,8 +48,8 @@
 }
 
 \examples{
-d <- loadDataset(file.path(system.file('extdata',package='omnetpp'),'PureAlohaExperiment*.sca'))
-makeScatterChartDataset(d, xScalar=list(module='.', name='mean'),
+data(aloha)
+makeScatterChartDataset(aloha, xScalar=list(module='.', name='mean'),
                         isoScalars=list(module='.', name='numHosts'),
                         averageReplications=TRUE)
 }

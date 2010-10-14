@@ -31,10 +31,12 @@
 \description{
   Plots a bar chart.
 }
-\usage{plotBarChart(data, \dots)}
+\usage{plotBarChart(data, \dots, conf.int=NULL)}
 \arguments{
     \item{data}{a numeric matrix, where rows are the groups of the bar chart and columns are the bars.}
     \item{\dots}{graphical properties of the chart (like titles, colors, \ldots)}
+    \item{conf.int}{if given, it must be a numeric matrix with the same shape as \code{data}
+                    containing the half lengths of the confidence intervals.}
 }
 
 \details{
@@ -54,8 +56,8 @@
 }
 
 \examples{
-d <- loadDataset(system.file('extdata/PureAloha1-0.sca', package='omnetpp'), add('scalar'))
-b <- makeBarChartDataset(d, rows=c('module','experiment','measurement'))
+data(aloha)
+b <- makeBarChartDataset(aloha, rows=c('module','experiment','measurement'))
 plotBarChart(b, Graph.Title='aloha')
 }
 

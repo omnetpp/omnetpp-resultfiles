@@ -58,8 +58,8 @@
 }
 
 \examples{
-d <- loadDataset(system.file('extdata/PureAloha1-0.vec', package='omnetpp'), add(type='vector'))
-vectors <- loadVectors(d, NULL)
+data(aloha)
+vectors <- loadVectors(aloha, NULL)
 plotLineChart(split(vectors$vectordata, vectors$vectordata$resultkey))
 }
 

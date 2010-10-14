@@ -57,8 +57,8 @@
 }
 
 \examples{
-d <- loadDataset(system.file('extdata/PureAloha1-0.sca', package='omnetpp'), add('scalar'))
-makeBarChartDataset(d, rows=c('module','experiment','measurement'), columns='name')
+data(aloha)
+makeBarChartDataset(aloha, rows=c('module','experiment','measurement'), columns='name')
 }
 
 \keyword{manip}
