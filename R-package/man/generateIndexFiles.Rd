@@ -38,4 +38,14 @@
     \item{rebuild}{Logical value indicating that the vector files are fragmented and need rebuilding.}
 }
 
+\details{
+Vector files need an index file for loading their data efficiently. These index data are generated
+by the simulation and stored in '.vci' files in the same directory as the '.vec' file.
+The index file can be rebuilt later by this command.
+
+Old vector files (before version 2) should be rebuilt by specifying 'rebuild'=TRUE, to ensure
+that the data of vectors are written out in chunks and can be efficiently indexed.
+When 'rebuild'=FALSE the vector file is not modified. 
+}
+
 \keyword{file}
