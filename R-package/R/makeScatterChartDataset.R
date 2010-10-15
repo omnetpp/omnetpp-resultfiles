@@ -32,8 +32,6 @@ makeScatterChartDataset <- function (dataset, xScalar, isoScalars=list(), isoAtt
   # group scalars according to iso scalars/attributes
   groupScalars <- function(scalars) {
     isoParams <- c(isoAttrs, paste(isoScalars$module, isoScalars$name))
-    if (is.null(isoParams) || length(isoParams) == 0)
-      return (list(scalars))
       
     # join run attributes and iso scalars with non-iso scalars
     isIsoScalar <- match(scalars$module, isoScalars$module, nomatch=0) ==
@@ -43,7 +41,7 @@ makeScatterChartDataset <- function (dataset, xScalar, isoScalars=list(), isoAtt
                        by='runid', all=TRUE)
     scalars <- merge(scalars[!isIsoScalar,], isoValues, by='runid')
                      
-    if (length(setdiff(isoParams, colnames(scalars)))>0)
+    if (is.null(isoParams) || length(isoParams) == 0 || length(setdiff(isoParams, colnames(scalars)))>0)
       return (list(scalars))
     
     # split according to the iso values
