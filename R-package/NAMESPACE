@@ -1,9 +1,6 @@
 useDynLib(omnetpp)
 
 export(loadDataset, loadVectors, generateIndexFiles)
-export(makeLineChartDataset, makeBarChartDataset, makeHistograms, makeScatterChartDataset)
-export(plotBarChart, plotHistogramChart, plotLineChart)
-export(conf.int, nextResultKey)
 
 S3method(summary, omnetpp_dataset)
 S3method(print, omnetpp_dataset_summary)
