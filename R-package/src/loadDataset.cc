@@ -30,11 +30,12 @@
 #include <iostream>
 #include <map>
 
+#include "resultfilemanager.h"
+
 #include <R.h>
 #include <Rdefines.h>
 #include <Rinternals.h>
 
-#include "resultfilemanager.h"
 #include "util.h"
 #include "loadDataset.h"
 

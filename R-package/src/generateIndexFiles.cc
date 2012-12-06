@@ -25,13 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "vectorfileindexer.h"
+
 #include <R.h>
 #include <Rdefines.h>
 #include <Rinternals.h>
 
-#include "vectorfileindexer.h"
 #include "generateIndexFiles.h"
-
 
 extern "C" {
 

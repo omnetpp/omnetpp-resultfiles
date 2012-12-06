@@ -30,10 +30,6 @@
 #include <iostream>
 #include <map>
 
-#include <R.h>
-#include <Rdefines.h>
-#include <Rinternals.h>
-
 #include "xyarray.h"
 #include "resultfilemanager.h"
 #include "nodetype.h"
@@ -41,8 +37,14 @@
 #include "dataflowmanager.h"
 #include "vectorfilereader.h"
 #include "arraybuilder.h"
-#include "util.h"
 #include "dataflownetworkbuilder.h"
+
+#include <R.h>
+#include <Rdefines.h>
+#include <Rinternals.h>
+#undef length
+
+#include "util.h"
 #include "loadVectors.h"
 
 struct IDAndArray {
@@ -69,7 +71,7 @@ public:
 static ProcessingOperationList parseProcessingOperations(SEXP commands)
 {
     ProcessingOperationList operations;
-    int numOfCommands = GET_LENGTH(commands);
+    int numOfCommands = Rf_length(commands);
     for (int i = 0; i < numOfCommands; ++i)
     {
         SEXP command = VECTOR_ELT(commands, i);
@@ -94,7 +96,7 @@ static ProcessingOperationList parseProcessingOperations(SEXP commands)
         functionName = CHAR(STRING_ELT(VECTOR_ELT(functionCall, 0), 0));
 
         SEXP names = GET_NAMES(functionCall);
-        for(int j = 1; j < GET_LENGTH(functionCall); ++j)
+        for(int j = 1; j < Rf_length(functionCall); ++j)
         {
             const char *argName = CHAR(STRING_ELT(names, j));
             SEXP argValue = VECTOR_ELT(functionCall, j);
@@ -139,8 +141,8 @@ static Vectors loadVectors(SEXP vectors, SEXP commands, ResultFileManager &manag
         return vs;
     }
 
-    int vectorCount = GET_LENGTH(vectorids);
-    if (GET_LENGTH(files) != vectorCount)
+    int vectorCount = Rf_length(vectorids);
+    if (Rf_length(files) != vectorCount)
     {
         error("vectors$file and vectors$vectorid have different lengths");
         return vs;
