@@ -97,7 +97,7 @@ class COMMON_API FileReader
     enum FileChangedState {
         UNCHANGED,
         APPENDED,
-        OVERWRITTEN,
+        OVERWRITTEN
     };
 
   private:

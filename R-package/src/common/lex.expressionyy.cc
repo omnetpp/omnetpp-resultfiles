@@ -1932,8 +1932,8 @@ YY_BUFFER_STATE expressionyy_scan_bytes  (yyconst char * yybytes, int  _yybytes_
 
 static void yy_fatal_error (yyconst char* msg )
 {
-    	(void) fprintf( stderr, "%s\n", msg );
-	exit( YY_EXIT_FAILURE );
+//    	(void) fprintf( stderr, "%s\n", msg );
+//	exit( YY_EXIT_FAILURE );
 }
 
 /* Redefine yyless() so it works in section 3 code. */

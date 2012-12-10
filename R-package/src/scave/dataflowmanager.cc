@@ -274,6 +274,7 @@ int64 DataflowManager::getTotalBytesToBeRead()
 
 void DataflowManager::dump()
 {
+/*
     printf("DATAFLOW NETWORK:\n");
     int n = nodes.size();
     printf("Nodes (%d):\n", n);
@@ -296,5 +297,6 @@ void DataflowManager::dump()
              consNode, consNode->getNodeType()->getName());
     }
     fflush(stdout);
+*/
 }
 

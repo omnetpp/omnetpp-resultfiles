@@ -1,12 +1,11 @@
 Package: omnetpp
 Version: 0.6-1
-Date: 2010-07-22
+Date: 2012-12-05
 Title: Functions for processing OMNeT++ result files
 Author: OpenSim Ltd.
-Maintainer: <r@omnetpp.org>
+Maintainer: <admin@omnetpp.org>
 Depends: R (>= 2.9.0), reshape
 Description: Functions for loading, filtering, and preprocessing
              the data stored in OMNeT++ result files.
 License: BSD
-URL: http://omnetpp.org
-Packaged: 2010-07-22 22:20:00 UTC; andras
+URL: http://github.com/omnetpp/omnetpp-resultfiles

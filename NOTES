@@ -1,14 +1,28 @@
 Technical notes:
 
-The R source package can be built from the working copy with the "R CMD build ." command.
-To build a binary package, use "R CMD build --binary ." command.
+BUILDING:
 
-When working on Windows, the same command will work, but the Rtools package 
-needs to be installed and all its bin/ dirs (bin/, perl/bin, MinGW/bin) as
-well as R/bin dir should be in the PATH.
+  The R source package can be built from the working copy with the 
+  "R CMD build --no-resave-data ." command. To build a binary package, 
+   use "R CMD build --binary --no-resave-data ." command.
 
-The working copy MUST be checked out with LF line endings (otherwise the vci
-files for sample vec files will be invalid!). To ensure that, set 
-"core.autocrlf=false" in the git repo (then make sure takes effect by
-deleting the working copy and checking it out again)
+  NOTE: When working on Windows, the same command will work, but the Rtools package 
+  needs to be installed and all its bin/ dirs (bin/, perl/bin, MinGW/bin) as
+  well as R/bin dir should be in the PATH.
+
+  The working copy MUST be checked out with LF line endings (otherwise the vci
+  files for sample vec files will be invalid!). To ensure that, set 
+  "core.autocrlf=false" in the git repo (then make sure takes effect by
+  deleting the working copy and checking it out again)
+
+INSTALLATION:
+
+  $ R CMD INSTALL omnetpp_0.6-1.tar.gz
+
+  NOTE: You may need to install the 'reshape' package before intsalling omnetpp.
+  > install.packages("reshape")
+
+INSTALLING from CRAN:
+  > install.packages("omnetpp")
+
 

@@ -278,7 +278,7 @@ class DataTableIterator
         DataTableIterator(const vector<DataTable*> &tables, int keyColumn)
             : cells(tables.size()), currentRows(tables.size())
         {
-            for (int i = 0; i < tables.size(); ++i)
+            for (unsigned int i = 0; i < tables.size(); ++i)
             {
                 this->cells[i] = DataTable::CellPtr(tables[i], 0, keyColumn);
                 currentRows[i] = -1;
@@ -365,7 +365,7 @@ JoinedDataTable::JoinedDataTable(const string name, const string description,
        Assert(iterator.hasNext());
        iterator.next();
 
-       for (int j = 0; j < joinedTables.size(); ++j)
+       for (unsigned int j = 0; j < joinedTables.size(); ++j)
            rowMap[row*tableCount+j]=iterator.currentRow(j);
    }
 }
@@ -497,7 +497,7 @@ void ScaveExport::saveVectors(const string &name, const string &description,
     Assert(vectors.size() == xyArrays.size());
 
     vector<DataTable*> tables;
-    for (int i = 0; i < xyArrays.size(); ++i)
+    for (unsigned int i = 0; i < xyArrays.size(); ++i)
     {
         const VectorResult& vector = manager.getVector(vectors.get(i));
         std::string yColumnName = makeUniqueIdentifier(*vector.moduleNameRef + "/" + *vector.nameRef);
