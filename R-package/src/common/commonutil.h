@@ -82,6 +82,8 @@ COMMON_API void setPosixLocale();
  * Debugging aid: prints a message on entering/leaving methods; message
  * gets indented according to call depth. See TRACE macro.
  */
+
+/* Commented out, because it uses printf (prohibited under R)
 class COMMON_API DebugCall
 {
   private:
@@ -93,6 +95,7 @@ class COMMON_API DebugCall
 };
 
 #define TRACE  DebugCall __x
+*/
 
 /**
  * Performs the RDTSC (read time stamp counter) x86 instruction, and returns

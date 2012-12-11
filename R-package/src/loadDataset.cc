@@ -238,7 +238,7 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
 {
     int paramsCount = 0, attrCount = 0, runAttrCount = 0;
 
-    SEXP dataset, names;
+    SEXP dataset;
     PROTECT(dataset = NEW_LIST(9));
     setNames(dataset, datasetColumnNames, datasetColumnsLength);
 

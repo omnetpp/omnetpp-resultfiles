@@ -3,8 +3,8 @@ Technical notes:
 BUILDING:
 
   The R source package can be built from the working copy with the 
-  "R CMD build --no-resave-data ." command. To build a binary package, 
-   use "R CMD build --binary --no-resave-data ." command.
+  "R CMD build --no-resave-data R-package" command. To build a binary package, 
+   use "R CMD build --binary --no-resave-data R-package" command.
 
   NOTE: When working on Windows, the same command will work, but the Rtools package 
   needs to be installed and all its bin/ dirs (bin/, perl/bin, MinGW/bin) as

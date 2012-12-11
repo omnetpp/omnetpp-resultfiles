@@ -427,7 +427,7 @@ double JoinedDataTable::getDoubleValue(int row, int col) const
 
 void JoinedDataTable::mapTableCell(int row, int col, DataTable* &table, int &tableRow, int &tableCol) const
 {
-    Assert(0 <= row && row < rowCount && 0 <= col && col < columnMap.size());
+    Assert(0 <= row && row < rowCount && 0 <= col && col < (int)columnMap.size());
 
     if (col == 0)
     {
@@ -494,7 +494,7 @@ void ScaveExport::saveVector(const string &name, const string &description,
 void ScaveExport::saveVectors(const string &name, const string &description,
                              const IDList &vectors, const vector<XYArray*> xyArrays, const ResultFileManager &manager)
 {
-    Assert(vectors.size() == xyArrays.size());
+    Assert(vectors.size() == (int)xyArrays.size());
 
     vector<DataTable*> tables;
     for (unsigned int i = 0; i < xyArrays.size(); ++i)

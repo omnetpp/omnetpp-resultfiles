@@ -139,6 +139,7 @@ void AggregatorNode::init()
         case Count:   count = 0; break;
         case Minimum: acc = POSITIVE_INFINITY; break;
         case Maximum: acc = NEGATIVE_INFINITY; break;
+        default: throw std::exception(); // cannot happen
     }
 }
 
@@ -151,6 +152,7 @@ void AggregatorNode::collect(double value)
         case Count:   count++; break;
         case Minimum: acc = std::min(value, acc); break;
         case Maximum: acc = std::max(value, acc); break;
+        default: throw std::exception(); // cannot happen
     }
 }
 
@@ -163,6 +165,7 @@ double AggregatorNode::result()
         case Count:   return count;
         case Minimum:
         case Maximum: return acc;
+        default: throw std::exception(); // cannot happen
     }
 }
 

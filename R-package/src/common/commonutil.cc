@@ -47,6 +47,7 @@ void setPosixLocale()
 
 //----
 
+/* Commented out, because it uses printf (prohibited under R)
 int DebugCall::depth;
 
 DebugCall::DebugCall(const char *fmt,...)
@@ -61,6 +62,7 @@ DebugCall::~DebugCall()
 {
     printf("%*s -- %s\n", --depth*2, "", funcname.c_str());
 }
+*/
 
 //----
 
