@@ -799,10 +799,12 @@ YY_DECL
 			(yy_start) = 1;	/* first start state */
 
 		if ( ! expressionyyin )
-			expressionyyin = stdin;
+			// Commented out, because it uses stdin/out (prohibited under R)
+			//expressionyyin = stdin;
 
 		if ( ! expressionyyout )
-			expressionyyout = stdout;
+			// Commented out, because it uses stdin/out (prohibited under R)
+			//expressionyyout = stdout;
 
 		if ( ! YY_CURRENT_BUFFER ) {
 			expressionyyensure_buffer_stack ();
@@ -2048,8 +2050,9 @@ static int yy_init_globals (void)
 
 /* Defined in main.c */
 #ifdef YY_STDINIT
-    expressionyyin = stdin;
-    expressionyyout = stdout;
+	// Commented out, because it uses stdin/out (prohibited under R)
+    //expressionyyin = stdin;
+    //expressionyyout = stdout;
 #else
     expressionyyin = (FILE *) 0;
     expressionyyout = (FILE *) 0;

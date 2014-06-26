@@ -626,7 +626,8 @@ void FileReader::seekTo(file_offset_t fileOffset, unsigned int ensureBufferSizeA
             if (PRINT_DEBUG_MESSAGES) printf("Keeping data from file offset: %"LL"d with length: %d\n", pointerToFileOffset(moveSrc), moveSize);
 #endif
 
-            fflush(stdout);
+			// Commented out, because it uses stdout (prohibited under R)
+            // fflush(stdout);
 
             memmove(moveDest, moveSrc, moveSize);
         }

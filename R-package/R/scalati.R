@@ -1,9 +1,8 @@
 #
-# (C) 2010 CSEM SA, Neuchâtel, Switzerland.
-# Jérôme Rousselot <jerome.rousselot@csem.ch>
+# (C) 2010 CSEM SA, Neuchatel, Switzerland.
+# Jerome Rousselot <jerome.rousselot@csem.ch>
 #
 
-library(omnetpp)
 library(lattice)
 library(gdata)   # needed for drop.levels
 library(gWidgets)
@@ -65,7 +64,7 @@ gridPanel <- function(...) {
 yscale.components.log10 <- function(lim, ...) {
     ans <- yscale.components.default(lim = lim, ...)
     tick.at.major <- c(0.001, 0.01, 0.1, 1, 10, 100, 1000) # seq(0.1, 1, 0.1) # c(0.25, 0.5, 0.75, 1) # seq(0.2, 1, 0.2)
-    ans$left$labels$labels <- c("10⁻³", "10⁻²", "10⁻¹", "1", "10", "100", "1000")#tick.at.major
+    ans$left$labels$labels <- c("0.001", "0.01", "0.1", "1", "10", "100", "1000")#tick.at.major
     ans$left$labels$at <- log(tick.at.major, 10)
     ans$left$ticks$tck <- 1.5
     ans$left$ticks$at  <- log(tick.at.major, 10)

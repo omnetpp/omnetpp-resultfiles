@@ -233,7 +233,8 @@ void VectorFileIndexer::generateIndex(const char *vectorFileName, IProgressMonit
 
         if (numOfUnrecognizedLines > 0)
         {
-            fprintf(stderr, "Found %d unrecognized lines in %s.\n", numOfUnrecognizedLines, vectorFileName);
+			// Commented out, because it uses printf (prohibited under R)
+            // fprintf(stderr, "Found %d unrecognized lines in %s.\n", numOfUnrecognizedLines, vectorFileName);
         }
     }
     catch (exception&)
@@ -303,12 +304,14 @@ void VectorFileIndexer::rebuildVectorFile(const char *vectorFileName, IProgressM
         ResultFile *f = resultFileManager.loadFile(vectorFileName);
         if (!f)
             throw opp_runtime_error("Cannot load %s", vectorFileName);
-        else if (f->numUnrecognizedLines>0)
-            fprintf(stderr, "WARNING: %s: %d invalid/incomplete lines out of %d\n", vectorFileName, f->numUnrecognizedLines, f->numLines);
+        else if (f->numUnrecognizedLines>0){}
+			// Commented out, because it uses printf (prohibited under R)
+            // fprintf(stderr, "WARNING: %s: %d invalid/incomplete lines out of %d\n", vectorFileName, f->numUnrecognizedLines, f->numLines);
 
         IDList vectorIDList = resultFileManager.getAllVectors();
         if (vectorIDList.isEmpty()) {
-            fprintf(stderr, "WARNING: %s: no vectors found\n", vectorFileName);
+			// Commented out, because it uses printf (prohibited under R)
+            // fprintf(stderr, "WARNING: %s: no vectors found\n", vectorFileName);
             return;
         }
 
