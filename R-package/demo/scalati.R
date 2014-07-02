@@ -2,7 +2,7 @@
 # (C) 2010 CSEM SA, Neuchatel, Switzerland.
 # Jerome Rousselot <jerome.rousselot@csem.ch>
 #
-
+library(omnetpp)
 library(lattice)
 library(gdata)   # needed for drop.levels
 library(gWidgets)
