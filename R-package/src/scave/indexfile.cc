@@ -186,6 +186,12 @@ bool RunData::parseLine(char **tokens, int numTokens, const char *filename, int6
         this->moduleParams[tokens[1]] = tokens[2];
         return true;
     }
+    else if (tokens[0][0] == 'i' && strcmp(tokens[0], "itervar") == 0)
+    {
+        CHECK(numTokens >= 3, "itervar <name> <value>");
+        this->moduleParams[tokens[1]] = tokens[2];
+        return true;
+    }
     else if (tokens[0][0] == 'r' && strcmp(tokens[0], "run") == 0)
     {
         CHECK(numTokens >= 2, "missing run name");
