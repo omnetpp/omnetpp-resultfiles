@@ -38,7 +38,7 @@ USING_NAMESPACE
 // helpers
 static inline int64 max(int64 x, int64 y) { return x > y ? x : y; }
 static inline int64 min(int64 x, int64 y) { return x < y ? x : y; }
-static inline int64 abs(int64 x) { return x >= 0 ? x : -x; }
+static inline int64 int_abs(int64 x) { return x >= 0 ? x : -x; }
 static inline int sgn(int64 x) { return (x > 0 ? 1 : (x < 0 ? -1 : 0)); }
 
 BigDecimal BigDecimal::Zero(0, 0);
@@ -146,7 +146,7 @@ int64 BigDecimal::getDigits(int scale, int numDigits) const
     if (start >= end)
         return 0;
 
-    int64 val = abs(this->intVal);
+    int64 val = int_abs(this->intVal);
     for (int i = this->scale; i < start; ++i)
         val /= 10;
 
