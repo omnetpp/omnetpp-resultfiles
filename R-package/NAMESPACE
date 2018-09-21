@@ -1,6 +1,6 @@
 useDynLib(omnetpp)
 
-export(loadDataset, loadVectors, generateIndexFiles)
+export(loadDataset, loadVectors, generateIndexFiles, add, discard)
 
 S3method(summary, omnetpp_dataset)
 S3method(print, omnetpp_dataset_summary)
