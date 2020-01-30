@@ -50,7 +50,8 @@ loadDataset <- function(files, ...) {
       fields = as.data.frame(dataset$fields),
       bins = as.data.frame(dataset$bins),
       params = as.data.frame(dataset$params),
-      attrs = as.data.frame(dataset$attrs)
+      attrs = as.data.frame(dataset$attrs),
+      itervars = as.data.frame(dataset$itervars)
     ),
     class='omnetpp_dataset'
   )
