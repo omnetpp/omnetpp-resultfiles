@@ -1,4 +1,10 @@
 This is an umbrella repository for software and documentation related to the OMNeT++ result file format.
+The current state reflects OMNeT++ 4.x. (Note that there were file format changes in version 5.2 and
+in later versions as well.)
+
+IMPORTANT!
+
+THIS PROJECT HAS BEEN ABANDONED. IF YOU WISH TO CONTINUE IT, PLEASE FORK IT AND NOTIFY THE OMNET++ CORE TEAM. THANK YOU!
 
 Contents:
  - documentation of the OMNeT++ result file format
