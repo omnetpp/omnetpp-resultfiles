@@ -208,6 +208,9 @@ struct SCAVE_API Run
     StringMap attributes;
     int runNumber; // this is stored separately as well, for convenience
 
+    // iteration variables, denotes by "itervar"
+    StringMap itervars;
+
     // module parameters: maps wildcard pattern to value
     StringMap moduleParams;
 
@@ -217,6 +220,12 @@ struct SCAVE_API Run
         StringMap::const_iterator it = attributes.find(attrName);
         return it==attributes.end() ? NULL : it->second.c_str();
     }
+
+    const char *getIterationVariable(const char *varName) const {
+        StringMap::const_iterator it = itervars.find(varName);
+        return it==itervars.end() ? NULL : it->second.c_str();
+    }
+
     const char *getModuleParam(const char *paramName) const {
         StringMap::const_iterator it = moduleParams.find(paramName);
         return it==moduleParams.end() ? NULL : it->second.c_str();

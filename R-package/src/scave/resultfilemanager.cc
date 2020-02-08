@@ -1082,6 +1082,19 @@ void ResultFileManager::processLine(char **vec, int numTokens, sParseContext &ct
         HistogramResult &histogram = ctx.fileRef->histogramResults.back();
         histogram.addBin(lower_bound, value);
     }
+    else if (vec[0][0]=='i' && !strcmp(vec[0],"itervar")) {
+
+        CHECK(numTokens>=3, "invalid result file: 'itervar <name> <value>' expected");
+
+        std::string varName = vec[1];
+        std::string varValue = vec[2];
+
+        StringMap &itervars = ctx.fileRunRef->runRef->itervars;
+        StringMap::iterator oldRef = itervars.find(varName);
+        CHECK(oldRef == itervars.end() || oldRef->second == varValue,
+           "Value of iteration variable conflicts with previously loaded value");
+        itervars[varName] = varValue;
+    }
     else if (vec[0][0]=='a' && !strcmp(vec[0],"attr"))
     {
         CHECK(numTokens>=3, "invalid result file: 'attr <name> <value>' expected");

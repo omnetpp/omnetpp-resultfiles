@@ -195,7 +195,7 @@ static IDList filterIDListByType(const IDList &idlist, int type, const ResultFil
     return result;
 }
 
-static const char* datasetColumnNames[] = {"runattrs", "fileruns", "scalars", "vectors", "statistics", "fields", "bins", "params", "attrs"};
+static const char* datasetColumnNames[] = {"runattrs", "fileruns", "scalars", "vectors", "statistics", "fields", "bins", "params", "attrs", "itervars"};
 static const int datasetColumnsLength = sizeof(datasetColumnNames) / sizeof(const char*);
 
 const char* runColumnNames[] = {"runid", "attrname", "attrvalue"};
@@ -234,12 +234,16 @@ const char* attributeColumnNames[] = {"attrtype", "resultkey", "attrname", "attr
 const SEXPTYPE attributeColumnTypes[] = {STRSXP, INTSXP, STRSXP, STRSXP};
 const int attributeColumnsLength = sizeof(attributeColumnNames) / sizeof(const char*);
 
+const char* itervarsColumnNames[] = {"runid", "varname", "varvalue"};
+const SEXPTYPE itervarsColumnTypes[] = {STRSXP, STRSXP, STRSXP};
+const int itervarsColumnsLength = sizeof(itervarsColumnNames) / sizeof(const char*);
+
 SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
 {
-    int paramsCount = 0, attrCount = 0, runAttrCount = 0;
+    int paramsCount = 0, attrCount = 0, runAttrCount = 0, itervarCount = 0;
 
     SEXP dataset;
-    PROTECT(dataset = NEW_LIST(9));
+    PROTECT(dataset = NEW_LIST(datasetColumnsLength));
     setNames(dataset, datasetColumnNames, datasetColumnsLength);
 
     // runattrs
@@ -250,6 +254,7 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
         Run *runPtr = runList->at(i);
         paramsCount += runPtr->moduleParams.size();
         runAttrCount += runPtr->attributes.size();
+        itervarCount += runPtr->itervars.size();
     }
     SEXP runattrs = createDataFrame(runColumnNames, runColumnTypes, runColumnsLength, runAttrCount);
     SEXP runid=VECTOR_ELT(runattrs,0), name=VECTOR_ELT(runattrs,1), value=VECTOR_ELT(runattrs,2);
@@ -446,6 +451,29 @@ SEXP exportDataset(ResultFileManager &manager, const IDList &idlist)
     addResultItemAttributes(attrs, index, "scalar", scalarIDs, scalarKeyStart, manager);
     addResultItemAttributes(attrs, index, "vector", vectorIDs, vectorKeyStart, manager);
     addResultItemAttributes(attrs, index, "statistic", statisticIDs, statisticKeyStart, manager);
+
+    SEXP itervars = createDataFrame(itervarsColumnNames, itervarsColumnTypes, itervarsColumnsLength, itervarCount);
+    SET_ELEMENT(dataset, 9, itervars);
+    UNPROTECT(1);
+    runid = VECTOR_ELT(itervars, 0);
+    name = VECTOR_ELT(itervars, 1);
+    value = VECTOR_ELT(itervars, 2);
+    index = 0;
+    for (int i = 0; i < runCount; i++) {
+
+       Run* run = runList->at(i);
+       SEXP runidSexp = mkChar(run->runName.c_str());
+       for (StringMap::const_iterator it=run->itervars.begin(); it != run->itervars.end(); ++it)
+       {
+           const char *nameStr = it->first.c_str();
+           const char *valueStr = it->second.c_str();
+           SET_STRING_ELT(runid, index, runidSexp);
+           SET_STRING_ELT(name, index, mkChar(nameStr));
+           SET_STRING_ELT(value, index, mkChar(valueStr));
+           index++;
+       }
+
+    }
 
     UNPROTECT(1); // dataset
 
