@@ -423,6 +423,9 @@ void IndexFileReader::parseLine(char **tokens, int numTokens, VectorFileIndex *i
         CHECK(parseInt(tokens[1], version), "version is not a number", lineNum);
         CHECK(version <= 2, "expects version 2 or lower", lineNum);
     }
+    else if (tokens[0][0] == 'i' && strcmp(tokens[0], "itervar") == 0) {
+        return;
+    }
     else if (index->run.parseLine(tokens, numTokens, filename.c_str(), lineNum))
     {
         return;

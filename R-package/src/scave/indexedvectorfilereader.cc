@@ -90,8 +90,6 @@ void IndexedVectorFileReaderNode::readIndexFile()
 
     if (!IndexFile::isVectorFile(fn))
         throw opp_runtime_error("indexed vector file reader: not a vector file, file %s", fn);
-    if (!IndexFile::isIndexFileUpToDate(fn))
-        throw opp_runtime_error("indexed vector file reader: index file is not up to date, file %s", fn);
 
     string indexFileName = IndexFile::getIndexFileName(fn);
     IndexFileReader reader(indexFileName.c_str());
