@@ -341,7 +341,7 @@ DataflowManager* PNetwork::createDataflowNetwork()
 
 DataflowNetworkBuilder::~DataflowNetworkBuilder()
 {
-    // TODO
+  delete dataflowManagerPtr;
 }
 
 void DataflowNetworkBuilder::build(const IDList &input, const ProcessingOperationList &operations)
